@@ -15,6 +15,7 @@ class Strategy:
     """
     name: str
     desc: str
+    assigned_player: int
 
     def make_move(self, game: PDGame) -> bool:
         """Return True if this Strategy cooperates, or False if this Strategy betrays."""
@@ -66,12 +67,17 @@ class TitForTatStrategy(Strategy):
         if curr_round == 1:
             return True
         else:
-            if game.is_player_1_move:
-                p2_prev_move = game.decisions[curr_round - 1][1]
-                return p2_prev_move
-            else:  # currently player2's move
-                p1_prev_move = game.decisions[curr_round - 1][0]
-                return p1_prev_move
+            opponent_player_num = int(not bool(self.assigned_player - 1))
+            prev_move = game.decisions[curr_round - 1][opponent_player_num]
+            return prev_move
+            # Version without self.assigned_player
+
+            # if game.is_player_1_move:
+            #     p2_prev_move = game.decisions[curr_round - 1][1]
+            #     return p2_prev_move
+            # else:  # currently player2's move
+            #     p1_prev_move = game.decisions[curr_round - 1][0]
+            #     return p1_prev_move
 
 
 class GrimStrategy(Strategy):
@@ -90,6 +96,7 @@ class GrimStrategy(Strategy):
 
     def make_move(self, game: PDGame) -> bool:
         """Cooperates until its opponent has betrayed once, and betrays the rest of the game.
+        Always cooperates on the first round.
 
         Returns True if this strategy cooperates, or returns False otherwise (betrays).
         """
@@ -101,20 +108,29 @@ class GrimStrategy(Strategy):
         elif self._been_betrayed:
             return False
         else:
-            # update self.been_betrayed
-            if game.is_player_1_move:
-                p2_prev_move = game.decisions[curr_round - 1][1]
-                if p2_prev_move is False:  # opponent betrayed last round
-                    self._been_betrayed = True
-                    return False
-            else:
-                p1_prev_move = game.decisions[curr_round - 1][0]
-                if p1_prev_move is False:
-                    self._been_betrayed = True
-                    return False
-
-            # getting here means that the opponent did not betray yet
+            opponent_player_num = int(not bool(self.assigned_player - 1))
+            prev_move = game.decisions[curr_round - 1][opponent_player_num]
+            if prev_move is False:
+                self._been_betrayed = True
+                return False
             return True
+
+            # Version without self.assgined_player
+
+            # # update self.been_betrayed
+            # if game.is_player_1_move:
+            #     p2_prev_move = game.decisions[curr_round - 1][1]
+            #     if p2_prev_move is False:  # opponent betrayed last round
+            #         self._been_betrayed = True
+            #         return False
+            # else:
+            #     p1_prev_move = game.decisions[curr_round - 1][0]
+            #     if p1_prev_move is False:
+            #         self._been_betrayed = True
+            #         return False
+            #
+            # # getting here means that the opponent did not betray yet
+            # return True
 
 
 class ProbabilityStrategy(Strategy):
@@ -172,7 +188,16 @@ class MoodyStrategy(Strategy):
         mood_threshold = self.mood_threshold
         mood = self.mood
 
-        # TODO: implement this function
+        # Very unsure about this implementation
+        # If mood goes above the threshold once, it will never come back down
+        if mood < mood_threshold:
+            if mood - (10 / game.curr_round) >= 0:
+                mood -= 10 / game.curr_round
+            return True
+        else:
+            if mood + (10 / game.curr_round) <= 100:
+                mood += (10 / game.curr_round)
+            return False
 
 
 class PavlovStrategy(Strategy):
@@ -180,8 +205,8 @@ class PavlovStrategy(Strategy):
     """
 
     def __init__(self) -> None:
-        self.name = 'Grim Strategy'
-        self.desc = 'Cooperate\'s until its opponent has defected once, and betrays the rest of the game'
+        self.name = 'Pavlov Strategy'
+        self.desc = 'Cooperates if opponent makes the same moves. Betray otherwise'
 
     def make_move(self, game: PDGame) -> bool:
         """If the opponent made the same decision last round as this player, then this
@@ -189,4 +214,12 @@ class PavlovStrategy(Strategy):
 
         Will always cooperate on round 1.
         """
-        # TODO: implement this function
+        curr_round = game.curr_round
+        # Always cooperate first round because there is no previous move to check
+        if curr_round == 1:
+            return True
+        else:
+            prev_move_tuple = game.decisions[curr_round - 1]
+            if prev_move_tuple[0] == prev_move_tuple[1]:  # Check move equality
+                return True
+            return False
