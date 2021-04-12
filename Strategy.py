@@ -15,7 +15,25 @@ class Strategy:
     """
     name: str
     desc: str
-    assigned_player: int
+
+    def get_opponent_num(self, game: PDGame) -> int:
+        """Returns 1 if it is Player1's turn, and 0 if it is Player2's turn.
+        """
+        if game.is_p1_turn:
+            return 1
+        else:
+            return 0
+
+    def get_opponent_prev_move(self, game: PDGame) -> bool:
+        """Return the previous move done by the opponent.
+
+        Preconditions:
+          - curr_round >= 2
+        """
+        opponent_num = self.get_opponent_num(game)
+        prev_round_num = game.curr_round - 1
+        prev_move = game.decisions[prev_round_num][opponent_num]
+        return prev_move
 
     def make_move(self, game: PDGame) -> bool:
         """Return True if this Strategy cooperates, or False if this Strategy betrays."""
@@ -67,11 +85,14 @@ class TitForTatStrategy(Strategy):
         if curr_round == 1:
             return True
         else:
-            opponent_player_num = int(not bool(self.assigned_player - 1))
-            prev_move = game.decisions[curr_round - 1][opponent_player_num]
-            return prev_move
-            # Version without self.assigned_player
+            return self.get_opponent_prev_move(game)
 
+            # Alternate Method:
+            # opponent_player_num = int(not bool(self.assigned_player - 1))
+            # prev_move = game.decisions[curr_round - 1][opponent_player_num]
+            # return prev_move
+            #
+            # Version without self.assigned_player:
             # if game.is_player_1_move:
             #     p2_prev_move = game.decisions[curr_round - 1][1]
             #     return p2_prev_move
@@ -108,12 +129,12 @@ class GrimStrategy(Strategy):
         elif self._been_betrayed:
             return False
         else:
-            opponent_player_num = int(not bool(self.assigned_player - 1))
-            prev_move = game.decisions[curr_round - 1][opponent_player_num]
+            prev_move = self.get_opponent_prev_move(game)
             if prev_move is False:
                 self._been_betrayed = True
                 return False
-            return True
+            else:
+                return True
 
             # Version without self.assgined_player
 

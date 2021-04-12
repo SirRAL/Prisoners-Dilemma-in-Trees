@@ -25,8 +25,6 @@ class Player:
         self.curr_points = 0
         self.strategy = strategy
         self.player_num = player_num
-        self.strategy.assigned_player = player_num
-        # Assign the strategy a player number to access the decision tuple more easily
 
     def make_move(self, game: PDGame) -> bool:
         """Return True if this player cooperates, and False otherwise.
