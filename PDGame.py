@@ -2,7 +2,7 @@
 
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
-import Player
+from Player import Player
 
 
 class PDGame:
@@ -14,20 +14,22 @@ class PDGame:
       - player1: player which goes first
       - player2: player which goes second
       - decisions: maps round number to (player1's decision, player2's decision)
-      - is_player_1_turn: True if player1 is making a decision, and False otherwise
+      - is_p1_turn: True if player1 is making a decision, and False otherwise
     """
     num_rounds: int
     curr_round: int
     player1: Player
     player2: Player
     decisions: dict[int, tuple[bool, bool]]
-    is_player_1_turn: bool
+    is_p1_turn: bool
 
     def __init__(self, num_rounds: int, player1: Player, player2: Player):
         self.num_rounds = num_rounds
+        self.curr_round = 1
         self.player1 = player1
         self.player2 = player2
         self.decisions = {}
+        self.is_p1_turn = True
 
     def run_game(self) -> None:
         """Run a game between two computer strategies.
