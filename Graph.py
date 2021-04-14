@@ -99,7 +99,7 @@ class WeightedGraph:
             # We didn't find an existing vertex for both items.
             raise ValueError
 
-    def get_weight(self, item1: Any, item2: Any) -> Union[int, float]:
+    def get_weight(self, item1: Any, item2: Any) -> dict:
         """Return the weight of the edge between the given items.
 
         Return 0 if item1 and item2 are not adjacent.
@@ -110,6 +110,9 @@ class WeightedGraph:
         v1 = self._vertices[item1]
         v2 = self._vertices[item2]
         return v1.neighbours.get(v2, 0)
+
+    def get_all_vertices(self):
+        return self._vertices
 
     # Don't currently need this
 
@@ -123,3 +126,14 @@ class WeightedGraph:
     #         return sum(v.neighbours.values()) / len(v.neighbours)
     #     else:
     #         raise ValueError
+
+
+def create_example():
+    example_graph = WeightedGraph()
+    example_graph.add_vertex('J')
+    example_graph.add_vertex('L')
+    example_graph.add_vertex('T')
+    example_graph.add_edge(('J', 0), ('L', 100))
+    example_graph.add_edge(('J', 50), ('T', 50))
+    example_graph.add_edge(('T', 50), ('L', 50))
+    return example_graph

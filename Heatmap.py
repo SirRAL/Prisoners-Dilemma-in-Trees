@@ -1,13 +1,6 @@
 import plotly.express as px
-from Graph import WeightedGraph
+from graph import WeightedGraph
 
-def unpack_graph(graph: WeightedGraph) -> dict:
-    data, x_values, y_values = [], [], []
-
-    results = {'data': data,
-               'x_values': x_values,
-               'y_values': y_values}
-    return results
 
 def create_example_heatmap():
     data = [[1, 25, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, 5, 20]]
@@ -21,10 +14,35 @@ def create_example_heatmap():
     fig.show()
 
 
+def unpack_graph(graph: WeightedGraph) -> dict:
+    data, x_labels, y_labels = [], [], []
+
+    # Generate all axis titles
+    for vertex in graph.get_all_vertices():
+        x_labels.append(vertex)
+        y_labels.append(vertex)
+
+    assert len(x_labels) == len(y_labels)
+
+    # Loop over all values and assign scores to corresponding blocks in the heatmap
+    for i in range(0, len(y_labels)):
+        data.append([])
+        for item in x_labels:
+            if item == y_labels[i]:
+                data[i].append(0)
+            else:
+                score = graph.get_weight(item, y_labels[i])
+                data[i].append(score[item])
+
+    results = {'data': data,
+               'x_values': x_labels,
+               'y_values': y_labels}
+    return results
+
+
 def create_heatmap(input_data, x_axis, y_axis):
-    data = input_data
-    fig = px.imshow(data,
-                    labels=dict(x="Day of Week", y="Time of Day", color="Win Rate"),
+    fig = px.imshow(input_data,
+                    labels=dict(x="Strategy", y="Opponent", color="Win Rate (%)"),
                     x=x_axis,
                     y=y_axis,
                     color_continuous_scale=['floralwhite', 'lime']
