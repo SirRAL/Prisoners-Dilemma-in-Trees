@@ -2,8 +2,8 @@
 
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
-import Strategy
-from PDGame import PDGame
+import strategy
+from pd_game import PDGame
 
 
 class Player:
@@ -18,10 +18,10 @@ class Player:
       - player_num in {1, 2}
     """
     curr_points: int
-    strategy: Strategy.Strategy
+    strategy: strategy.Strategy
     player_num: int
 
-    def __init__(self, strategy: Strategy.Strategy, player_num: int):
+    def __init__(self, strategy: strategy.Strategy, player_num: int):
         self.curr_points = 0
         self.strategy = strategy
         self.player_num = player_num
