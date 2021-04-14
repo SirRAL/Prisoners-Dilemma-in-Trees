@@ -2,7 +2,7 @@
 
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
-from PDGame import PDGame
+from pd_game import PDGame
 import random
 
 
