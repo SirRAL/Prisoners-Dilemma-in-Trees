@@ -2,7 +2,10 @@
 
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
-from tkinter import Tk, Label, Grid, Button, Entry, Frame
+from strategy import JesusStrategy, LuciferStrategy, TitForTatStrategy, GrimStrategy, \
+    ProbabilityStrategy, MoodyStrategy, PavlovStrategy
+from tkinter import Tk, Label, Grid, Button, Entry, Frame, OptionMenu, StringVar
+from typing import Callable
 
 class Main:
     """Main runner for Prisoner's Dilemma.
@@ -34,7 +37,7 @@ class Main:
         # TODO: implement this function
 
 
-def draw_main_window():
+def draw_main_window() -> None:
     """Draws the starting menu for the user.
     Execute this function on startup of this module.
     """
@@ -85,5 +88,38 @@ def draw_main_window():
     root.mainloop()
 
 
-draw_main_window()
+def destroy_and_open(window: Tk, function: Callable) -> None:
+    """Destroys window and calls function."""
+    window.destroy()
+    function()
 
+
+def draw_ai_v_ai() -> None:
+    """Draws the AI vs. AI window."""
+    root = Tk()
+
+    title_label = Label(root, text='AI vs. AI', font='TkHeadingFont:')
+
+    title_label.grid(row=1, column=2)
+
+    instructions = Label(root, text='Here, you can select two AI strategies and '
+                                    'pit them against each other to see who reigns supreme!')
+
+    instructions.grid(row=2, column=2)
+
+    # dropdown menus
+
+    options = []
+
+    strategies = [JesusStrategy, LuciferStrategy, TitForTatStrategy, GrimStrategy,
+                  ProbabilityStrategy, MoodyStrategy, PavlovStrategy]
+    strategy_names = [strategy.name for strategy in strategies]
+
+    player1_selection = StringVar(root)
+
+    player1_menu = OptionMenu(root, player1_selection, default='No selection', *strategy_names)
+
+    root.mainloop()
+
+
+draw_main_window()
