@@ -75,7 +75,7 @@ class TitForTatStrategy(Strategy):
 
     def __init__(self) -> None:
         self.name = 'Tit for Tat Strategy'
-        self.desc = 'Cooperate the first round, then reciprocates the ' \
+        self.desc = 'Cooperates the first round, \n then reciprocates the \n' \
                     'opponent\'s previous move indefinitely.'
 
     def make_move(self, game: PDGame) -> bool:
@@ -112,7 +112,8 @@ class GrimStrategy(Strategy):
 
     def __init__(self) -> None:
         self.name = 'Grim Strategy'
-        self.desc = 'Cooperates until its opponent has betrayed once, and betrays the rest of the game'
+        self.desc = 'Cooperates until its opponent has betrayed \n' \
+                    ' once, and betrays the rest of the game.'
         self._been_betrayed = False
 
     def make_move(self, game: PDGame) -> bool:
@@ -227,7 +228,7 @@ class PavlovStrategy(Strategy):
 
     def __init__(self) -> None:
         self.name = 'Pavlov Strategy'
-        self.desc = 'Cooperates if opponent makes the same moves. Betray otherwise'
+        self.desc = 'Cooperates if its opponent makes the same moves. \n Will betray otherwise.'
 
     def make_move(self, game: PDGame) -> bool:
         """If the opponent made the same decision last round as this player, then this
