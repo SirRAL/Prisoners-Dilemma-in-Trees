@@ -44,7 +44,7 @@ class PDGame:
 
         If <round_num> is illegal, raise a ValueError.
         """
-        if round_num > self.curr_round:
+        if round_num not in self.decisions:
             raise ValueError('Tried to find results of a non-existent round!')
         else:
             decisions = self.decisions[round_num]
@@ -52,7 +52,8 @@ class PDGame:
 
     def get_points(self, player_num: int) -> int:
         """Returns the number of points gained by the specified player up to the
-        current round.
+        current round - 1.
         """
         return sum(self.resolve_round(round_num)[player_num - 1]
-                   for round_num in range(self.curr_round))
+                   for round_num in range(1, self.curr_round)
+                   )
