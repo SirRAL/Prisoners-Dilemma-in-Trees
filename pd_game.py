@@ -23,3 +23,36 @@ class PDGame:
         self.curr_round = 1
         self.decisions = {}
         self.is_p1_turn = True
+
+    def resolve_points(self, decision1: bool, decision2: bool) -> tuple[int, int]:
+        """Return (p1_points, p2_points) according to the decisions made.
+        """
+        if decision1 is True:
+            if decision2 is True:
+                return (5, 5)
+            else:
+                return (0, 15)
+        else:
+            if decision2 is True:
+                return (15, 0)
+            else:
+                return (0, 0)
+
+    def resolve_round(self, round_num: int) -> tuple[int, int]:
+        """Returns (p1_points, p2_points) according to the results of the round
+        specified by <round_num>.
+
+        If <round_num> is illegal, raise a ValueError.
+        """
+        if round_num > self.curr_round:
+            raise ValueError('Tried to find results of a non-existent round!')
+        else:
+            decisions = self.decisions[round_num]
+            return self.resolve_points(decisions[0], decisions[1])
+
+    def get_points(self, player_num: int) -> int:
+        """Returns the number of points gained by the specified player up to the
+        current round.
+        """
+        return sum(self.resolve_round(round_num)[player_num - 1]
+                   for round_num in range(self.curr_round))
