@@ -145,13 +145,9 @@ class GameTree:
 
     def update_avg_pts_gained(self, game: PDGame) -> None:
         """Recalculate the average points gained for entering this tree for the AI.
-        Should be called AFTER _update_pick_chance.
+        Should be called AFTER update_pick_chance.
 
         This function should be called after every GAME.
-
-        Preconditions:
-          - called only after every game
-
         """
         # if we just ended the game, do not update any leaves
         # (we would've update the leaf's avg_pts_gained earlier)
