@@ -15,13 +15,17 @@ from player import Player
 # TODO: ADD LEARNING AI TO LIST OF STRATEGIES TO BE CHOSEN IN AI vs. AI
 # Perhaps only allow LearningStrategy to be chosen for Player 1
 
-def run_game(self, game: PDGame, player1: Player, player2: Player) -> None:
+
+def run_game(num_rounds: int, player1: Player, player2: Player) -> None:
     """Run a game between two computer strategies.
     """
     # player1.player_num = 1
     # player2.player_num = 2
 
+    game = PDGame(num_rounds)
+
     for i in range(0, game.num_rounds):
+
         game.is_p1_turn = True
         move1 = player1.make_move(game)
         game.is_p1_turn = False
@@ -34,36 +38,39 @@ def run_game(self, game: PDGame, player1: Player, player2: Player) -> None:
         game.decisions[game.curr_round] = (move1, move2)
         game.curr_round += 1
 
-    def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
-        """Run a tournament between all strategies.
-        If <show_heatmap> is set, then display a heatmap that shows the match-ups
-        between the strategies.
-        """
+    ai_vs_ai_summary_screen(game)
 
 
-        all_strategies = get_all_strategies()
-        all_strategies_except_ai = get_all_strategies()[:7]
-        if not show_heatmap:
-            for strategy1 in all_strategies:
-                new_game = PDGame(game.num_rounds)
-                player1 = Player(strategy1, 1)
-                for strategy2 in all_strategies_except_ai:
-                    player2 = Player(strategy2, 2)
-                    self.run_game(new_game, player1, player2)
-        else:
-            graph = WeightedGraph()
-            for strategy1 in all_strategies:
-                new_game = PDGame(game.num_rounds)
-                player1 = Player(strategy1, 1)
-                graph.add_vertex(player1.strategy.name)
-                for strategy2 in all_strategies_except_ai:
-                    player2 = Player(strategy2, 2)
-                    graph.add_vertex(player2.strategy.name)
-                    self.run_game(new_game, player1, player2)
-                    graph.add_edge((player1.strategy.name, player1.curr_points),
-                                (player2.strategy.name, player2.curr_points))
 
-def run_user_game(self, game: PDGame, player2: Player) -> None:
+def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
+    """Run a tournament between all strategies.
+    If <show_heatmap> is set, then display a heatmap that shows the match-ups
+    between the strategies.
+    """
+    all_strategies = get_all_strategies()
+    all_strategies_except_ai = get_all_strategies()[:7]
+    if not show_heatmap:
+        for strategy1 in all_strategies:
+            new_game = PDGame(game.num_rounds)
+            player1 = Player(strategy1, 1)
+            for strategy2 in all_strategies_except_ai:
+                player2 = Player(strategy2, 2)
+                run_game(new_game, player1, player2)
+    else:
+        graph = WeightedGraph()
+        for strategy1 in all_strategies:
+            new_game = PDGame(game.num_rounds)
+            player1 = Player(strategy1, 1)
+            graph.add_vertex(player1.strategy.name)
+            for strategy2 in all_strategies_except_ai:
+                player2 = Player(strategy2, 2)
+                graph.add_vertex(player2.strategy.name)
+                run_game(new_game, player1, player2)
+                graph.add_edge((player1.strategy.name, player1.curr_points),
+                            (player2.strategy.name, player2.curr_points))
+
+
+def run_user_game(game: PDGame, player2: Player) -> None:
     """Run a game between a user and a computer strategy.
     """
     user = Player(strategy=None, player_num=1)
@@ -145,10 +152,11 @@ def draw_main_window() -> None:
     root.mainloop()
 
 
-def destroy_and_open(window: Tk, function: Callable) -> None:
+def destroy_and_open(window: Tk, function: Callable) -> Any:
     """Destroys window and calls function."""
     window.destroy()
     function()
+    print('done 2')
 
 
 def draw_ai_vs_ai() -> None:
@@ -176,12 +184,20 @@ def draw_ai_vs_ai() -> None:
     instructions2 = Label(input_frame, text='Number of rounds to be played: ')
     instructions2.grid(row=1, column=1)
 
-    num_rounds_possible = [str(x) for x in range(10, 100)]
+    num_rounds_possible = [str(x) for x in range(10, 40)]
     num_rounds = StringVar(root)
     num_rounds.set(num_rounds_possible[0])
     input_field = ttk.Combobox(input_frame, textvariable=num_rounds, values=num_rounds_possible,
                                state='readonly')
     input_field.grid(row=2, column=1, pady=10)
+
+    def update_num_rounds(event=None) -> None:
+        if event is None:
+            pass
+        # num_rounds.set(num_rounds)
+        game_change_rounds()
+
+    input_field.bind('<<ComboboxSelected>>', update_num_rounds)
 
     # Matchup label
 
@@ -189,17 +205,18 @@ def draw_ai_vs_ai() -> None:
     matchup_label.grid(row=4, column=2, pady=15)
 
     # dropdown menus
-    jesus = JesusStrategy()
-    lucifer = LuciferStrategy()
-    tit_for_tat = TitForTatStrategy()
-    grim = GrimStrategy()
-    probability = ProbabilityStrategy(50.0)
-    moody = MoodyStrategy(0)
-    pavlov = PavlovStrategy()
+    jesus = get_all_strategies()[0]()
+    lucifer = get_all_strategies()[1]()
+    tit_for_tat = get_all_strategies()[2]()
+    grim = get_all_strategies()[3]()
+    probability = get_all_strategies()[4](50.0)
+    moody = get_all_strategies()[5]()
+    pavlov = get_all_strategies()[6]()
+    learning = get_all_strategies()[7](0)
 
     # initialize strategy info
 
-    strategies = [jesus, lucifer, tit_for_tat, grim, probability, moody, pavlov]
+    strategies = [jesus, lucifer, tit_for_tat, grim, probability, moody, pavlov, learning]
     strategy_names = [strategy.name for strategy in strategies]
     name_to_desc = {strategy.name: strategy.desc for strategy in strategies}
 
@@ -220,18 +237,28 @@ def draw_ai_vs_ai() -> None:
     player1_desc.grid(row=2, column=1, padx=20)
     player2_desc.grid(row=2, column=3, padx=20)
 
-    def change_description(event=None) -> None:
-        """Updates the strategy descriptions to their latest state."""
+    def change_strategy(event=None) -> None:
+        """Updates the strategy descriptions to their latest state
+        and updates the strategies accordingly."""
         if event is None:
             pass
         player1_desc.configure(text=name_to_desc[player1_selection.get()])
         player2_desc.configure(text=name_to_desc[player2_selection.get()])
 
+        for strategy in strategies:
+            if player1_selection.get() == strategy.name:
+                print('reassigned 1')
+                player1.strategy = strategy.__copy__()
+            if player2_selection.get() == strategy.name:
+                print('reassigned 2')
+                player2.strategy = strategy.__copy__()
+
+
     # draw left dropdown menu
 
     player1_menu = ttk.Combobox(dropdown_frame, textvariable=player1_selection,
                                 values=strategy_names, state='readonly')
-    player1_menu.bind('<<ComboboxSelected>>', change_description)
+    player1_menu.bind('<<ComboboxSelected>>', change_strategy)
 
     player1_menu.grid(row=1, column=1)
 
@@ -239,7 +266,7 @@ def draw_ai_vs_ai() -> None:
 
     player2_menu = ttk.Combobox(dropdown_frame, textvariable=player2_selection,
                                 values=strategy_names, state='readonly')
-    player2_menu.bind('<<ComboboxSelected>>', change_description)
+    player2_menu.bind('<<ComboboxSelected>>', change_strategy)
 
     player2_menu.grid(row=1, column=3)
 
@@ -254,13 +281,27 @@ def draw_ai_vs_ai() -> None:
 
     back_button.grid(row=6, column=0, padx=5)
 
+    player1 = Player(None, 1)
+    player2 = Player(None, 2)
+
+    def initialize_game() -> PDGame:
+        rounds_to_play = int(num_rounds.get())
+        return PDGame(rounds_to_play)
+
+    def game_change_rounds() -> None:
+        game.num_rounds = int(num_rounds.get())
+
+    game = initialize_game()
+
+    change_strategy()
+
     # start button
     # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
     # For example, use player1_selection and player2_selection to find which Strategy each chose,
     # and num_rounds
+
     start_button = Button(root, text='Start!',
-                          command=lambda: destroy_and_open(root, ai_vs_ai_summary_screen(PDGame(num_rounds.get()))),
-                          padx=10, pady=0)
+                          command=lambda: run_game(int(num_rounds.get()), player1, player2), padx=10)
     start_button.grid(row=6, column=2, pady=10)
 
     root.mainloop()
@@ -415,7 +456,7 @@ def draw_player_vs_ai() -> None:
     instructions2 = Label(input_frame, text='Number of rounds to be played: ')
     instructions2.grid(row=1, column=1)
 
-    num_rounds_possible = [str(x) for x in range(10, 100)]
+    num_rounds_possible = [str(x) for x in range(10, 40)]
     num_rounds = StringVar(root)
     num_rounds.set(num_rounds_possible[0])
     input_field = ttk.Combobox(input_frame, textvariable=num_rounds, values=num_rounds_possible,
@@ -424,13 +465,13 @@ def draw_player_vs_ai() -> None:
 
     # dropdown menus
 
-    jesus = JesusStrategy()
-    lucifer = LuciferStrategy()
-    tit_for_tat = TitForTatStrategy()
-    grim = GrimStrategy()
-    probability = ProbabilityStrategy(0.0)
-    moody = MoodyStrategy(0)
-    pavlov = PavlovStrategy()
+    jesus = get_all_strategies()[0]()
+    lucifer = get_all_strategies()[1]()
+    tit_for_tat = get_all_strategies()[2]()
+    grim = get_all_strategies()[3]()
+    probability = get_all_strategies()[4](50.0)
+    moody = get_all_strategies()[5]()
+    pavlov = get_all_strategies()[6]()
 
     # initialize strategy info
 
@@ -538,9 +579,6 @@ def draw_battle_royale() -> None:
     root.mainloop()
 
 
-
-
-
 def ai_vs_ai_summary_screen(game: PDGame) -> None:
     """Displays the summary of the aftermath of an AI vs AI game.
     """
@@ -557,7 +595,17 @@ def ai_vs_ai_summary_screen(game: PDGame) -> None:
     match_summary_label = Label(interface_frame, text='Match Summary')
     match_summary_label.grid(row=1, column=1)
 
-    statistics = ['Starting game...', 'Finishing...', 'Reporting outcomes...']
+    statistics = ['Starting game...', 'Finishing...', 'Reporting outcomes...',
+                  'Played ' + str(game.num_rounds) + ' rounds.']
+
+    winner = game.resolve_game(1, 2)
+
+    if winner == 1:
+        statistics.append('Player 1 won.')
+    elif winner == 2:
+        statistics.append('Player 2 won.')
+    else:
+        statistics.append('Both players tied.')
 
     # stats_so_far = StringVar(value=statistics)
     match_summary_log = Listbox(interface_frame, height=20, width=75)

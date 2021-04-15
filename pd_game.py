@@ -50,14 +50,6 @@ class PDGame:
             decisions = self.decisions[round_num]
             return self.resolve_points(decisions[0], decisions[1])
 
-    # def get_points(self, player_num: int) -> int:
-    #     """Returns the number of points gained by the specified player up to the
-    #     current round.
-    #     """
-    #     return sum(self.resolve_round(round_num)[player_num - 1]
-    #                for round_num in range(1, self.curr_round + 1)
-    #                )
-
     def get_points_prev(self, player_num: int) -> int:
         """Returns the number of points gained by the specified player up to the
         previous round.
@@ -66,10 +58,15 @@ class PDGame:
                    for round_num in range(1, self.curr_round)
                    )
 
-    def get_points_prev(self, player_num: int) -> int:
-        """Returns the number of points gained by the specified player up to the
-        previous round.
-        """
-        return sum(self.resolve_round(round_num)[player_num - 1]
-                   for round_num in range(1, self.curr_round)
-                   )
+    def resolve_game(self, player1_num, player2_num) -> int:
+        """Returns the winner of this game. If a tie, returns 3."""
+        player1_score = self.get_points_prev(player1_num)
+        player2_score = self.get_points_prev(player2_num)
+        print(player1_score)
+        print(player2_score)
+        if player1_score > player2_score:
+            return 1
+        elif player1_score < player2_score:
+            return 2
+        else:  # Tie
+            return 3
