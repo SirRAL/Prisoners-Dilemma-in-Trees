@@ -18,7 +18,6 @@ class Main:
         # player1.player_num = 1
         # player2.player_num = 2
 
-
         for i in range(0, game.num_rounds):
             game.is_p1_turn = True
             move1 = player1.make_move(game)
