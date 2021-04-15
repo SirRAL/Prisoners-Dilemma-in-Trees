@@ -18,7 +18,7 @@ class Main:
         """
         # TODO: implement this function
 
-    def run_tournament(self, show_heatmap: bool) -> None:
+    def run_tournament(self, show_heatmap: bool = True) -> None:
         """Run a tournament between all strategies.
 
         If <show_heatmap> is set, then display a heatmap that shows the match-ups
