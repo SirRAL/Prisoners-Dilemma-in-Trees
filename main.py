@@ -18,7 +18,6 @@ class Main:
         # player1.player_num = 1
         # player2.player_num = 2
 
-
         for i in range(0, game.num_rounds):
             game.is_p1_turn = True
             move1 = player1.make_move(game)
@@ -77,9 +76,6 @@ class Main:
                     self.run_game(new_game, player1, player2)
                     graph.add_edge((player1.strategy.name, player1.curr_points),
                                    (player2.strategy.name, player2.curr_points))
-
-
-
 
 
     # def resolve_round(self, decision1: bool, decision2: bool) -> None:
