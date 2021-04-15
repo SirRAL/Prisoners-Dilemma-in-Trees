@@ -53,8 +53,7 @@ def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
     between the strategies.
     """
     all_strategies = get_all_strategies()
-    # TODO: Change
-    all_strategies_except_ai = get_all_strategies().copy().remove('Learning Strategy')
+    all_strategies_except_ai = get_all_strategies()[:7]
     if not show_heatmap:
         for strategy1 in all_strategies:
             new_game = PDGame(game.num_rounds)
@@ -74,10 +73,3 @@ def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
                 self.run_game(new_game, player1, player2)
                 graph.add_edge((player1.strategy.name, player1.curr_points),
                                (player2.strategy.name, player2.curr_points))
-
-# def resolve_round(self, decision1: bool, decision2: bool) -> None:
-#     """Takes Player 1's decision and Player 2's decision, determines
-#     each player's points gained or lost, and mutates each Player's
-#     curr_points to reflect it.
-#     """
-#     # TODO: implement this function
