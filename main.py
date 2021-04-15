@@ -11,10 +11,10 @@ from pd_strategy import Strategy, get_all_strategies
 from pd_game import PDGame
 from Graph import WeightedGraph
 from player import Player
+from copy import copy
 
 # TODO: ADD LEARNING AI TO LIST OF STRATEGIES TO BE CHOSEN IN AI vs. AI
 # Perhaps only allow LearningStrategy to be chosen for Player 1
-
 
 def run_game(num_rounds: int, player1: Player, player2: Player) -> None:
     """Run a game between two computer strategies.
@@ -41,9 +41,9 @@ def run_game(num_rounds: int, player1: Player, player2: Player) -> None:
     ai_vs_ai_summary_screen(game)
 
 
-
 def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
     """Run a tournament between all strategies.
+
     If <show_heatmap> is set, then display a heatmap that shows the match-ups
     between the strategies.
     """
@@ -67,7 +67,7 @@ def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
                 graph.add_vertex(player2.strategy.name)
                 run_game(new_game, player1, player2)
                 graph.add_edge((player1.strategy.name, player1.curr_points),
-                            (player2.strategy.name, player2.curr_points))
+                               (player2.strategy.name, player2.curr_points))
 
 
 def run_user_game(game: PDGame, player2: Player) -> None:
@@ -86,14 +86,6 @@ def run_user_game(game: PDGame, player2: Player) -> None:
 
         game.decisions[game.curr_round] = (user_move, move2)
         game.curr_round += 1
-
-
-    def resolve_round(self, decision1: bool, decision2: bool) -> None:
-        """Takes Player 1's decision and Player 2's decision, determines
-        each player's points gained or lost, and mutates each Player's
-        curr_points to reflect it.
-        """
-        # TODO: implement this function
 
 
 def draw_main_window() -> None:
@@ -214,6 +206,7 @@ def draw_ai_vs_ai() -> None:
     pavlov = get_all_strategies()[6]()
     learning = get_all_strategies()[7](0)
 
+
     # initialize strategy info
 
     strategies = [jesus, lucifer, tit_for_tat, grim, probability, moody, pavlov, learning]
@@ -247,12 +240,9 @@ def draw_ai_vs_ai() -> None:
 
         for strategy in strategies:
             if player1_selection.get() == strategy.name:
-                print('reassigned 1')
                 player1.strategy = strategy.__copy__()
             if player2_selection.get() == strategy.name:
-                print('reassigned 2')
                 player2.strategy = strategy.__copy__()
-
 
     # draw left dropdown menu
 
@@ -300,8 +290,8 @@ def draw_ai_vs_ai() -> None:
     # For example, use player1_selection and player2_selection to find which Strategy each chose,
     # and num_rounds
 
-    start_button = Button(root, text='Start!',
-                          command=lambda: run_game(int(num_rounds.get()), player1, player2), padx=10)
+    start_button = Button(root, text='Start!', command=lambda: run_game(int(num_rounds.get()), player1, player2), padx=10)
+
     start_button.grid(row=6, column=2, pady=10)
 
     root.mainloop()
