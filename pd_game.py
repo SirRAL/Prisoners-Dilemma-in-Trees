@@ -52,8 +52,8 @@ class PDGame:
 
     def get_points(self, player_num: int) -> int:
         """Returns the number of points gained by the specified player up to the
-        current round - 1.
+        current round.
         """
         return sum(self.resolve_round(round_num)[player_num - 1]
-                   for round_num in range(1, self.curr_round)
+                   for round_num in range(1, self.curr_round + 1)
                    )
