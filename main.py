@@ -104,7 +104,7 @@ def destroy_and_open(window: Tk, function: Callable) -> None:
 
 
 def draw_ai_vs_ai() -> None:
-    """Draws the AI vs. AI window."""
+    """Draws the AI vs. AI interface."""
     root = Tk()
 
     # prevent window from being manually resized as it causes weird behaviour with labels
@@ -131,11 +131,16 @@ def draw_ai_vs_ai() -> None:
     num_rounds_possible = [str(x) for x in range(10, 100)]
     num_rounds = StringVar(root)
     num_rounds.set(num_rounds_possible[0])
-    input_field = ttk.Combobox(input_frame, textvariable=num_rounds, values=num_rounds_possible)
+    input_field = ttk.Combobox(input_frame, textvariable=num_rounds, values=num_rounds_possible,
+                               state='readonly')
     input_field.grid(row=2, column=1, pady=10)
 
-    # dropdown menus
+    # Matchup label
 
+    matchup_label = Label(root, text='Matchup: ')
+    matchup_label.grid(row=4, column=2, pady=15)
+
+    # dropdown menus
     jesus = JesusStrategy()
     lucifer = LuciferStrategy()
     tit_for_tat = TitForTatStrategy()
@@ -173,19 +178,23 @@ def draw_ai_vs_ai() -> None:
         player2_desc.configure(text=name_to_desc[player2_selection.get()])
 
     # draw left dropdown menu
-    player1_menu = OptionMenu(dropdown_frame, player1_selection, *strategy_names,
-                              command=change_description)
+
+    player1_menu = ttk.Combobox(dropdown_frame, textvariable=player1_selection,
+                                values=strategy_names, state='readonly')
+    player1_menu.bind('<<ComboboxSelected>>', change_description)
 
     player1_menu.grid(row=1, column=1)
 
     # draw right dropdown menu
-    player2_menu = OptionMenu(dropdown_frame, player2_selection, *strategy_names,
-                              command=change_description)
+
+    player2_menu = ttk.Combobox(dropdown_frame, textvariable=player2_selection,
+                                values=strategy_names, state='readonly')
+    player2_menu.bind('<<ComboboxSelected>>', change_description)
 
     player2_menu.grid(row=1, column=3)
 
     # draw the "VS"
-    versus_label = Label(dropdown_frame, text='VS.')
+    versus_label = Label(dropdown_frame, text='VS.', font='TkHeadingFont:')
 
     versus_label.grid(row=1, column=2, padx=30)
 
@@ -197,7 +206,8 @@ def draw_ai_vs_ai() -> None:
 
     # start button
     # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
-    # For example, use player1_selection and player2_selection to find which Strategy each chose
+    # For example, use player1_selection and player2_selection to find which Strategy each chose,
+    # and num_rounds
     start_button = Button(root, text='Start!', command=..., padx=10, pady=0)
     start_button.grid(row=6, column=2, pady=10)
 
@@ -205,7 +215,7 @@ def draw_ai_vs_ai() -> None:
 
 
 def draw_player_vs_ai() -> None:
-    """Draws the Player vs. AI window.
+    """Draws the Player vs. AI interface.
     """
     root = Tk()
 
@@ -232,7 +242,8 @@ def draw_player_vs_ai() -> None:
     num_rounds_possible = [str(x) for x in range(10, 100)]
     num_rounds = StringVar(root)
     num_rounds.set(num_rounds_possible[0])
-    input_field = ttk.Combobox(input_frame, textvariable=num_rounds, values=num_rounds_possible)
+    input_field = ttk.Combobox(input_frame, textvariable=num_rounds, values=num_rounds_possible,
+                               state='readonly')
     input_field.grid(row=2, column=1, pady=10)
 
     # dropdown menus
@@ -270,17 +281,18 @@ def draw_player_vs_ai() -> None:
         player2_desc.configure(text=name_to_desc[player2_selection.get()])
 
     # draw YOU label
-    you_label = Label(dropdown_frame, text='YOU')
+    you_label = Label(dropdown_frame, text='You')
     you_label.grid(row=1, column=1)
 
     # draw right dropdown menu
-    player2_menu = OptionMenu(dropdown_frame, player2_selection, *strategy_names,
-                              command=change_description)
+    player2_menu = ttk.Combobox(dropdown_frame, textvariable=player2_selection,
+                                values=strategy_names, state='readonly')
+    player2_menu.bind('<<ComboboxSelected>>', change_description)
 
     player2_menu.grid(row=1, column=3)
 
     # draw the "VS"
-    versus_label = Label(dropdown_frame, text='VS.')
+    versus_label = Label(dropdown_frame, text='VS.', font='TkHeadingFont:')
 
     versus_label.grid(row=1, column=2, padx=15)
 
@@ -293,12 +305,56 @@ def draw_player_vs_ai() -> None:
     # start button
     # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
     # For example, use player1_selection and player2_selection to find which Strategy each chose
+    # and num_rounds
     start_button = Button(root, text='Start!', command=..., padx=10, pady=0)
     start_button.grid(row=6, column=2, pady=10)
 
     root.mainloop()
 
+
 def draw_battle_royale() -> None:
-    ...
+    """Draws the tournament interface."""
+    root = Tk()
+
+    # prevent window from being manually resized as it causes weird behaviour with labels
+    root.resizable(False, False)
+
+    root.title('AI Battle Royale')
+
+    title_label = Label(root, text='AI Battle Royale', font='TkHeadingFont:')
+
+    title_label.grid(row=1, column=2)
+
+    instructions = Label(root, text='Here, you get to witness the various strategies '
+                                    'face off against one another!', padx=30)
+
+    instructions.grid(row=2, column=2)
+
+    # input number of rounds
+    input_frame = Frame(root)
+    input_frame.grid(row=3, column=2)
+    instructions2 = Label(input_frame, text='Number of rounds to be played: ')
+    instructions2.grid(row=1, column=1)
+
+    num_rounds_possible = [str(x) for x in range(10, 100)]
+    num_rounds = StringVar(root)
+    num_rounds.set(num_rounds_possible[0])
+    input_field = ttk.Combobox(input_frame, textvariable=num_rounds, values=num_rounds_possible,
+                               state='readonly')
+    input_field.grid(row=2, column=1, pady=10)
+
+    # Back button
+    back_button = Button(root, text='Back',
+                         command=lambda: destroy_and_open(root, draw_main_window))
+
+    back_button.grid(row=6, column=0, padx=5)
+
+    # start button
+    # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
+    start_button = Button(root, text='Start!', command=..., padx=10, pady=0)
+    start_button.grid(row=6, column=2, pady=10)
+
+    root.mainloop()
+
 
 draw_main_window()
