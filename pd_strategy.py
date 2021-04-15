@@ -3,6 +3,7 @@
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
 from pd_game import PDGame
+from game_tree import GameTree
 import random
 
 
@@ -257,6 +258,7 @@ class MoodyStrategy(Strategy):
 
         return current_mood
 
+
 class PavlovStrategy(Strategy):
     """A strategy that cooperates if the opponent makes the same move as it, betrays otherwise.
     """
@@ -280,3 +282,61 @@ class PavlovStrategy(Strategy):
             if prev_move_tuple[0] == prev_move_tuple[1]:  # Check move equality
                 return True
             return False
+
+
+class LearningStrategy(Strategy):
+    """A strategy which adapts to its opponent's strategy.
+    """
+    _game_tree: GameTree
+    _temp_tree: GameTree
+    _exploration_chance: float
+
+    def __init__(self, exploration_chance: float, game_tree: GameTree = GameTree()) -> None:
+        self._game_tree = game_tree
+        self._temp_tree = self._game_tree
+        self._exploration_chance = exploration_chance
+
+    def update_game_tree_after_round(self, game: PDGame) -> None:
+        """Update game_tree to the latest information, as well as update
+        temp_tree to have the most recent moves as its root.
+
+        Run this after every round.
+        """
+        # Because self._temp_tree references self._game_tree,
+        # mutating self._temp_tree in this way will also mutate self._game_tree.
+        self._temp_tree.update_after_round(game)
+        self._temp_tree = self._temp_tree.find_subtree_by_moves(game.decisions[game.curr_round])
+
+    def update_game_tree_after_game(self, game: PDGame) -> None:
+        """Update game_tree to the latest information, as well as reset temp_tree.
+
+        Run this after every game.
+        """
+        # updates the leaf representing the final round with the actual points gained
+        self._temp_tree.avg_pts_gained = game.get_points(1)
+        # update avg_pts_gained for all nodes in the tree
+        self._game_tree.update_after_game(game)
+        # reset temp_tree
+        self._temp_tree = self._game_tree
+
+    def make_move(self, game: PDGame) -> bool:
+        """Make a decision based on the "best" decision as decided by its tree, or make
+        a random move if it is learning.
+        """
+        if self._temp_tree.get_subtrees() == []:
+            return self._get_random_move()
+
+        # random float which determines if player will explore
+        rand_check = random.uniform(0, 1)
+
+        # explore
+        if rand_check < self._exploration_chance:
+            return self._get_random_move()
+        # don't explore
+        else:
+            return self._temp_tree.get_best_move()
+
+    def _get_random_move(self) -> bool:
+        """Return a random decision.
+        """
+        return random.choice([True, False])

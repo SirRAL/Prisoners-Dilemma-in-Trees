@@ -11,7 +11,6 @@ class Main:
     def run_game(self) -> None:
         """Run a game between two computer strategies.
         """
-        # TODO: implement this function
 
     def run_user_game(self) -> None:
         """Run a game between a user and a computer strategy.
