@@ -65,8 +65,6 @@ class Main:
         else:
             graph = WeightedGraph()
 
-
-
     # def resolve_round(self, decision1: bool, decision2: bool) -> None:
     #     """Takes Player 1's decision and Player 2's decision, determines
     #     each player's points gained or lost, and mutates each Player's
