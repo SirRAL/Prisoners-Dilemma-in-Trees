@@ -4,7 +4,7 @@ Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
 from pd_strategy import JesusStrategy, LuciferStrategy, TitForTatStrategy, GrimStrategy, \
     ProbabilityStrategy, MoodyStrategy, PavlovStrategy
-from tkinter import Tk, Label, Button, Entry, Frame, OptionMenu, StringVar, ttk
+from tkinter import Tk, Label, Button, Entry, Frame, OptionMenu, StringVar, ttk, Listbox
 from typing import Callable
 
 # TODO: ADD LEARNING AI TO LIST OF STRATEGIES TO BE CHOSEN IN AI vs. AI
@@ -306,7 +306,9 @@ def draw_player_vs_ai() -> None:
     # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
     # For example, use player1_selection and player2_selection to find which Strategy each chose
     # and num_rounds
-    start_button = Button(root, text='Start!', command=..., padx=10, pady=0)
+    start_button = Button(root, text='Start!',
+                          command=lambda: destroy_and_open(root, player_vs_ai_interface),
+                          padx=10, pady=0)
     start_button.grid(row=6, column=2, pady=10)
 
     root.mainloop()
@@ -355,6 +357,54 @@ def draw_battle_royale() -> None:
     start_button.grid(row=6, column=2, pady=10)
 
     root.mainloop()
+
+
+def player_vs_ai_interface() -> None:
+    """The interface for a player to play with a strategy AI."""
+
+    root = Tk()
+    root.resizable(False, False)
+    root.title('Player vs. AI Game')
+    title_label = Label(root, text='Player vs. AI', font='TkHeadingFont:')
+    title_label.grid(row=1, column=2, pady=15)
+
+    interface_frame = Frame(root)
+    interface_frame.grid(row=3, column=2)
+
+    decision_log_label = Label(interface_frame, text='Decision Log')
+    decision_log_label.grid(row=1, column=1)
+
+
+
+    decision_list = [str(x + 999999999999999999999999999999999999999999999999) for x in range(100)]
+    decisions = StringVar(value=decision_list)
+    decision_log = Listbox(interface_frame, listvariable=decisions, height=20, width=50)
+    decision_log.grid(row=2, column=1)
+
+    decision_window = Frame(interface_frame, bd=2)
+    decision_window.grid(row=2, column=2)
+
+    make_decision_label = Label(decision_window, text='Make Your Decision!', font='TkHeadingFont:')
+    make_decision_label.grid(row=1, column=2)
+
+    cooperate_button = Button(decision_window, text='COOPERATE')
+    cooperate_button.grid(row=2, column=1, padx=10)
+
+    betray_button = Button(decision_window, text='BETRAY')
+    betray_button.grid(row=2, column=3, padx=10)
+
+    turn_label = Label(decision_window, text='Turn: ' + '1')
+    turn_label.grid(row=3, column=2)
+
+    your_score = Label(decision_window, text='Your score: ' + '1')
+    your_score.grid(row=4, column=2)
+
+    opponent_score = Label(decision_window, text='Your opponent\'s score: ' + '1')
+    opponent_score.grid(row=5, column=2)
+
+    root.mainloop()
+
+
 
 
 draw_main_window()
