@@ -36,13 +36,22 @@ class Main:
         """
         # TODO: implement this function
 
-    def run_tournament(self, show_heatmap: bool = True) -> None:
+    def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
         """Run a tournament between all strategies.
 
         If <show_heatmap> is set, then display a heatmap that shows the match-ups
         between the strategies.
         """
         all_strategies = get_all_strategies()
+        if not show_heatmap:
+            for strategy1 in all_strategies:
+                new_game = PDGame(game.num_rounds)
+                player1 = Player(strategy1, 1)
+                for strategy2 in all_strategies:
+                    player2 = Player(strategy2, 2)
+                    self.run_game(new_game, player1, player2)
+        else:
+            graph = WeightedGraph()
 
 
 
