@@ -1,5 +1,5 @@
 import plotly.express as px
-from graph import WeightedGraph
+from Graph import WeightedGraph
 
 
 def create_example_heatmap():
@@ -31,11 +31,11 @@ def unpack_graph(graph: WeightedGraph) -> dict:
     for i in range(0, len(y_labels)):
         data.append([])
         for item in x_labels:
-            if item == y_labels[i]:
-                data[i].append(0)
-            else:
-                score = graph.get_weight(item, y_labels[i])
-                data[i].append(score[item])
+            # if item == y_labels[i]:
+            #     data[i].append(0)
+            # else:
+            score = graph.get_weight(item, y_labels[i])
+            data[i].append(score[item])
 
     results = {'data': data,
                'x_values': x_labels,
@@ -45,7 +45,7 @@ def unpack_graph(graph: WeightedGraph) -> dict:
 
 def create_heatmap(input_data: list, x_axis: list, y_axis: list) -> None:
     fig = px.imshow(input_data,
-                    labels=dict(x="Strategy", y="Opponent", color="Win Rate (%)"),
+                    labels=dict(x="Strategy", y="Opponent", color="Points"),
                     x=x_axis,
                     y=y_axis,
                     color_continuous_scale=['floralwhite', 'lime']
