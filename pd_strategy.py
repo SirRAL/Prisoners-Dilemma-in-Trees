@@ -261,6 +261,7 @@ class MoodyStrategy(Strategy):
 
         return current_mood
 
+
 class PavlovStrategy(Strategy):
     """A strategy that cooperates if the opponent makes the same move as it, betrays otherwise.
     """
@@ -342,71 +343,3 @@ class LearningStrategy(Strategy):
         """Return a random decision.
         """
         return random.choice([True, False])
-
-
-def plot_game_statistics(results: list[str]) -> None:
-    """Plot the outcomes and points won for each player for a given list of PD game results.
-    """
-    outcomes = [1 if result == 'White' else 0 for result in results]
-
-    cumulative_win_probability = [sum(outcomes[0:i]) / i for i in range(1, len(outcomes) + 1)]
-    rolling_win_probability = \
-        [sum(outcomes[max(i - 50, 0):i]) / min(50, i) for i in range(1, len(outcomes) + 1)]
-
-    fig = make_subplots(rows=2, cols=1)
-    fig.add_trace(go.Scatter(y=outcomes, mode='markers',
-                             name='Outcome (1 = White win, 0 = Draw/Black win)'),
-                  row=1, col=1)
-    fig.add_trace(go.Scatter(y=cumulative_win_probability, mode='lines',
-                             name='White win percentage (cumulative)'),
-                  row=2, col=1)
-    fig.add_trace(go.Scatter(y=rolling_win_probability, mode='lines',
-                             name='White win percentage (most recent 50 games)'),
-                  row=2, col=1)
-    fig.update_yaxes(range=[0.0, 1.0], row=2, col=1)
-
-    fig.update_layout(title='Minichess Game Results', xaxis_title='Game')
-    fig.show()
-
-
-def test(self):
-    """Test"""
-    strat = LearningStrategy(0)
-
-    # game 1
-    game = PDGame(2)
-    move = strat.make_move(game)
-    game.decisions[game.curr_round] = (True, True)
-    strat.update_game_tree_after_round(game)
-    game.curr_round += 1
-
-    move = strat.make_move(game)
-    game.decisions[game.curr_round] = (True, False)
-    strat.update_game_tree_after_round(game)
-    strat.update_game_tree_after_game(game)
-
-    # game 2
-    game = PDGame(2)
-    move = strat.make_move(game)
-    game.decisions[game.curr_round] = (True, True)
-    strat.update_game_tree_after_round(game)
-    game.curr_round += 1
-
-    move = strat.make_move(game)
-    game.decisions[game.curr_round] = (True, True)
-    strat.update_game_tree_after_round(game)
-    strat.update_game_tree_after_game(game)
-
-    # game 3
-    game = PDGame(2)
-    move = strat.make_move(game)
-    game.decisions[game.curr_round] = (False, True)
-    strat.update_game_tree_after_round(game)
-    game.curr_round += 1
-
-    move = strat.make_move(game)
-    game.decisions[game.curr_round] = (False, False)
-    strat.update_game_tree_after_round(game)
-    strat.update_game_tree_after_game(game)
-
-
