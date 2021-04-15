@@ -4,10 +4,7 @@ Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
 from pd_game import PDGame
 from game_tree import GameTree
-from typing import Optional
 import random
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 
 class Strategy:
