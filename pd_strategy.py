@@ -281,3 +281,8 @@ class PavlovStrategy(Strategy):
             if prev_move_tuple[0] == prev_move_tuple[1]:  # Check move equality
                 return True
             return False
+
+
+def get_all_strategies():
+    return [JesusStrategy, LuciferStrategy, TitForTatStrategy,
+            GrimStrategy, ProbabilityStrategy, MoodyStrategy, PavlovStrategy]
