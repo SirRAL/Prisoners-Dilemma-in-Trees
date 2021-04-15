@@ -7,6 +7,7 @@ from pd_game import PDGame
 from Graph import WeightedGraph
 from player import Player
 
+
 class Main:
     """Main runner for Prisoner's Dilemma.
     """
@@ -31,11 +32,22 @@ class Main:
             game.decisions[game.curr_round] = (move1, move2)
             game.curr_round += 1
 
-
-    def run_user_game(self) -> None:
+    def run_user_game(self, game: PDGame, player2: Player) -> None:
         """Run a game between a user and a computer strategy.
         """
-        # TODO: implement this function
+        user = Player(strategy=None, player_num=1)
+        for _ in range(0, game.num_rounds):
+            game.is_p1_turn = True
+            user_move = ...  # take user input
+            game.is_p1_turn = False
+            move2 = player2.make_move(game)
+
+            round_results = game.resolve_points(user_move, move2)
+            user.curr_points += round_results[0]
+            player2.curr_points += round_results[1]
+
+            game.decisions[game.curr_round] = (user_move, move2)
+            game.curr_round += 1
 
     def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
         """Run a tournament between all strategies.
