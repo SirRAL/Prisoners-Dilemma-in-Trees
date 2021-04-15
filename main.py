@@ -5,7 +5,9 @@ Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 from pd_strategy import JesusStrategy, LuciferStrategy, TitForTatStrategy, GrimStrategy, \
     ProbabilityStrategy, MoodyStrategy, PavlovStrategy
 from tkinter import Tk, Label, Button, Entry, Frame, OptionMenu, StringVar, ttk, Listbox
-from typing import Callable
+from typing import Any, Callable
+from pd_game import PDGame
+from player import Player
 
 # TODO: ADD LEARNING AI TO LIST OF STRATEGIES TO BE CHOSEN IN AI vs. AI
 # Perhaps only allow LearningStrategy to be chosen for Player 1
@@ -25,7 +27,7 @@ class Main:
         """
         # TODO: implement this function
 
-    def run_tournament(self, show_heatmap: bool) -> None:
+    def run_tournament(self, show_heatmap: bool = True) -> None:
         """Run a tournament between all strategies.
 
         If <show_heatmap> is set, then display a heatmap that shows the match-ups
@@ -145,7 +147,7 @@ def draw_ai_vs_ai() -> None:
     lucifer = LuciferStrategy()
     tit_for_tat = TitForTatStrategy()
     grim = GrimStrategy()
-    probability = ProbabilityStrategy(0.0)
+    probability = ProbabilityStrategy(50.0)
     moody = MoodyStrategy(0)
     pavlov = PavlovStrategy()
 
@@ -174,6 +176,8 @@ def draw_ai_vs_ai() -> None:
 
     def change_description(event=None) -> None:
         """Updates the strategy descriptions to their latest state."""
+        if event is None:
+            pass
         player1_desc.configure(text=name_to_desc[player1_selection.get()])
         player2_desc.configure(text=name_to_desc[player2_selection.get()])
 
@@ -208,8 +212,134 @@ def draw_ai_vs_ai() -> None:
     # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
     # For example, use player1_selection and player2_selection to find which Strategy each chose,
     # and num_rounds
-    start_button = Button(root, text='Start!', command=..., padx=10, pady=0)
+    start_button = Button(root, text='Start!',
+                          command=lambda: destroy_and_open(root, ai_vs_ai_summary_screen(PDGame(num_rounds.get()))),
+                          padx=10, pady=0)
     start_button.grid(row=6, column=2, pady=10)
+
+    root.mainloop()
+
+
+def player_vs_ai_interface(game: PDGame) -> None:
+    """The interface for a player to play with a strategy AI."""
+
+    root = Tk()
+    root.resizable(False, False)
+    root.title('Player vs. AI Game')
+    title_label = Label(root, text='Player vs. AI', font='TkHeadingFont:')
+    title_label.grid(row=1, column=2, pady=15)
+
+    # interface_frame is high level frame
+    interface_frame = Frame(root)
+    interface_frame.grid(row=3, column=2)
+
+    decision_log_label = Label(interface_frame, text='Decision Log')
+    decision_log_label.grid(row=1, column=1)
+
+    # decision list is the list of strings that will be outputted by the decision log
+
+    # TODO: REMOVE
+    # format from PDGame.decisions
+    decision_list = {1: (True, True), 2: (False, True), 3: (True, False)}
+
+    def process_decision(decisions: dict[int, tuple[bool, bool]]) -> str:
+        """Takes in a decision dictionary and outputs the next string to put in the decision log."""
+        # Take the latest tuple and process it
+        decision_tuple = decisions[len(decisions)]
+        player_decision = decision_tuple[0]
+        opponent_decision = decision_tuple[1]
+
+        if player_decision is True:
+            result = 'You chose to cooperate.'
+        else:
+            result = 'You chose to betray.'
+
+        if opponent_decision is True:
+            result += ' Your opponent chose to cooperate.'
+        else:
+            result += ' Your opponent chose to betray.'
+
+        return result
+
+    decisions = StringVar(value=decision_list)
+    decision_log = Listbox(interface_frame, listvariable=decisions, height=20, width=75)
+    decision_log.grid(row=2, column=1)
+
+    def make_score_delta(game: PDGame) -> tuple[str, str]:
+        """Returns a string tuple of
+        (Player1 points gained, Player2 points gained) for the previous round.
+
+        The points gained or loss have a corresponding sign added as a prefix for each string.
+        """
+        decisions = game.decisions
+        latest_decision_tuple = decisions[game.curr_round - 1]
+        player1_decision = latest_decision_tuple[0]
+        player2_decision = latest_decision_tuple[1]
+        int_tuple = game.resolve_points(player1_decision, player2_decision)
+        if int_tuple[0] >= 0:
+            str_player1_points = '+' + str(int_tuple[0])
+        else:
+            str_player1_points = '-' + str(int_tuple[0])
+
+        if int_tuple[1] >= 0:
+            str_player2_points = '+' + str(int_tuple[1])
+        else:
+            str_player2_points = '-' + str(int_tuple[1])
+
+        return (str_player1_points, str_player2_points)
+
+    def insert_latest_decision() -> None:
+        """Inserts a string representation of the latest round into the decision log."""
+        # game.decisions = {1: (True, True), 2: (False, True), 3: (True, False), 4: (False, False)}
+        # TODO: REMOVE
+        game.decisions[game.curr_round] = (True, False)
+
+        decision_log.insert(len(decision_list), process_decision(game.decisions))
+
+        # TODO MAYBE REMOVE
+        game.curr_round += 1
+        play_round()
+
+    decision_window = Frame(interface_frame, bd=2)
+    decision_window.grid(row=2, column=2)
+
+    make_decision_label = Label(decision_window, text='Make Your Decision!', font='TkHeadingFont:')
+    make_decision_label.grid(row=1, column=2)
+
+    cooperate_button = Button(decision_window, text='COOPERATE', command=insert_latest_decision)
+    cooperate_button.grid(row=2, column=1, padx=10)
+
+    betray_button = Button(decision_window, text='BETRAY')
+    betray_button.grid(row=2, column=3, padx=10)
+
+    # TODO: REMOVE
+    # game.decisions = {1: (True, True), 2: (True, False), 3: (False, False), 4: (False, True)}
+    game.decisions = {}
+
+    def play_round() -> None:
+
+        # game.decisions = {1: (True, True), 2: (True, False), 3: (False, False), 4: (False, True)}
+
+        turn_label = Label(decision_window, text='Turn: ' + str(game.curr_round))
+        turn_label.grid(row=3, column=2)
+
+        your_score = Label(decision_window)
+        opponent_score = Label(decision_window)
+        if game.curr_round == 1:
+            your_score.configure(text='Your score: 0')
+            opponent_score.configure(text='Your opponent\'s score: 0')
+
+        else:
+            print(game.curr_round)
+            your_score.configure(text='Your score: ' + str(game.get_points_prev(1)) + ' (' +
+                                      make_score_delta(game)[0] + ')')
+            opponent_score.configure(text='Your opponent\'s score: ' + str(
+                game.get_points_prev(2)) + ' (' + make_score_delta(game)[1] + ')')
+
+        your_score.grid(row=4, column=2)
+        opponent_score.grid(row=5, column=2)
+
+    play_round()
 
     root.mainloop()
 
@@ -278,6 +408,8 @@ def draw_player_vs_ai() -> None:
 
     def change_description(event=None) -> None:
         """Updates the strategy descriptions to their latest state."""
+        if event is None:
+            pass
         player2_desc.configure(text=name_to_desc[player2_selection.get()])
 
     # draw YOU label
@@ -306,8 +438,9 @@ def draw_player_vs_ai() -> None:
     # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
     # For example, use player1_selection and player2_selection to find which Strategy each chose
     # and num_rounds
+    # Actually, call the runner, which will call the player vs. ai interface and pass in a game
     start_button = Button(root, text='Start!',
-                          command=lambda: destroy_and_open(root, player_vs_ai_interface),
+                          command=lambda: destroy_and_open(root, player_vs_ai_interface(PDGame(num_rounds.get()))),
                           padx=10, pady=0)
     start_button.grid(row=6, column=2, pady=10)
 
@@ -353,58 +486,104 @@ def draw_battle_royale() -> None:
 
     # start button
     # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
-    start_button = Button(root, text='Start!', command=..., padx=10, pady=0)
+    start_button = Button(root, text='Start!', command=lambda: battle_royale_summary_screen(PDGame(num_rounds.get())), padx=10, pady=0)
     start_button.grid(row=6, column=2, pady=10)
 
     root.mainloop()
 
 
-def player_vs_ai_interface() -> None:
-    """The interface for a player to play with a strategy AI."""
 
+
+
+def ai_vs_ai_summary_screen(game: PDGame) -> None:
+    """Displays the summary of the aftermath of an AI vs AI game.
+    """
     root = Tk()
     root.resizable(False, False)
-    root.title('Player vs. AI Game')
-    title_label = Label(root, text='Player vs. AI', font='TkHeadingFont:')
+    root.title('AI vs. AI Summary')
+    title_label = Label(root, text='AI vs. AI Game Summary', font='TkHeadingFont:')
     title_label.grid(row=1, column=2, pady=15)
 
+    # interface_frame is high level frame
     interface_frame = Frame(root)
     interface_frame.grid(row=3, column=2)
 
-    decision_log_label = Label(interface_frame, text='Decision Log')
-    decision_log_label.grid(row=1, column=1)
+    match_summary_label = Label(interface_frame, text='Match Summary')
+    match_summary_label.grid(row=1, column=1)
+
+    statistics = ['Starting game...', 'Finishing...', 'Reporting outcomes...']
+
+    # stats_so_far = StringVar(value=statistics)
+    match_summary_log = Listbox(interface_frame, height=20, width=75)
+    match_summary_log.grid(row=2, column=1)
 
 
-
-    decision_list = [str(x + 999999999999999999999999999999999999999999999999) for x in range(100)]
-    decisions = StringVar(value=decision_list)
-    decision_log = Listbox(interface_frame, listvariable=decisions, height=20, width=50)
-    decision_log.grid(row=2, column=1)
+    def insert_statistics() -> None:
+        """Inserts string statistics into the match summary log."""
+        # match_summary_log.insert(len(statistics), [stat for stat in statistics])
+        for i in range(len(statistics)):
+            match_summary_log.insert(i, statistics[i])
 
     decision_window = Frame(interface_frame, bd=2)
     decision_window.grid(row=2, column=2)
 
-    make_decision_label = Label(decision_window, text='Make Your Decision!', font='TkHeadingFont:')
+    make_decision_label = Label(decision_window, text='Visualizations', font='TkHeadingFont:')
     make_decision_label.grid(row=1, column=2)
 
-    cooperate_button = Button(decision_window, text='COOPERATE')
+    cooperate_button = Button(decision_window, text='Open Heatmap', command=...)
     cooperate_button.grid(row=2, column=1, padx=10)
 
-    betray_button = Button(decision_window, text='BETRAY')
+    betray_button = Button(decision_window, text='Open Graph')
     betray_button.grid(row=2, column=3, padx=10)
 
-    turn_label = Label(decision_window, text='Turn: ' + '1')
-    turn_label.grid(row=3, column=2)
-
-    your_score = Label(decision_window, text='Your score: ' + '1')
-    your_score.grid(row=4, column=2)
-
-    opponent_score = Label(decision_window, text='Your opponent\'s score: ' + '1')
-    opponent_score.grid(row=5, column=2)
+    insert_statistics()
 
     root.mainloop()
 
 
+def battle_royale_summary_screen(game: PDGame) -> None:
+    """Displays the summary of the aftermath of a tournament game.
+    """
+    root = Tk()
+    root.resizable(False, False)
+    root.title('Battle Royale Summary')
+    title_label = Label(root, text='Battle Royale Game Summary', font='TkHeadingFont:')
+    title_label.grid(row=1, column=2, pady=15)
+
+    # interface_frame is high level frame
+    interface_frame = Frame(root)
+    interface_frame.grid(row=3, column=2)
+
+    match_summary_label = Label(interface_frame, text='Match Summary')
+    match_summary_label.grid(row=1, column=1)
+
+    statistics = ['Starting game...', 'Finishing...', 'Reporting outcomes...']
+
+    # stats_so_far = StringVar(value=statistics)
+    match_summary_log = Listbox(interface_frame, height=20, width=75)
+    match_summary_log.grid(row=2, column=1)
+
+    def insert_statistics() -> None:
+        """Inserts string statistics into the match summary log."""
+        # match_summary_log.insert(len(statistics), [stat for stat in statistics])
+        for i in range(len(statistics)):
+            match_summary_log.insert(i, statistics[i])
+
+    decision_window = Frame(interface_frame, bd=2)
+    decision_window.grid(row=2, column=2)
+
+    make_decision_label = Label(decision_window, text='Visualizations', font='TkHeadingFont:')
+    make_decision_label.grid(row=1, column=2)
+
+    cooperate_button = Button(decision_window, text='Open Heatmap', command=...)
+    cooperate_button.grid(row=2, column=1, padx=10)
+
+    betray_button = Button(decision_window, text='Open Graph')
+    betray_button.grid(row=2, column=3, padx=10)
+
+    insert_statistics()
+
+    root.mainloop()
 
 
 draw_main_window()

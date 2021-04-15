@@ -57,3 +57,11 @@ class PDGame:
         return sum(self.resolve_round(round_num)[player_num - 1]
                    for round_num in range(1, self.curr_round + 1)
                    )
+
+    def get_points_prev(self, player_num: int) -> int:
+        """Returns the number of points gained by the specified player up to the
+        previous round.
+        """
+        return sum(self.resolve_round(round_num)[player_num - 1]
+                   for round_num in range(1, self.curr_round)
+                   )
