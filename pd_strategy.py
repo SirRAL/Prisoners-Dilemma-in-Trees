@@ -190,15 +190,35 @@ class MoodyStrategy(Strategy):
     mood: float
     mood_threshold: float
 
-    def __init__(self, mood_threshold: float, initial_mood: float = 50.0) -> None:
+    def __init__(self) -> None:
         """Creates a Moody strategy with an initial mood.
 
         The initial mood defaults to 50.0 if no initial_mood is passed as an argument.
         """
         self.name = 'Moody Strategy'
         self.desc = 'Cooperates more often if its opponent cooperates often.'
-        self.mood = initial_mood
-        self.mood_threshold = mood_threshold
+        # self.mood = initial_mood
+        # self.mood_threshold = mood_threshold
+
+    # def make_move(self, game: PDGame) -> bool:
+    #     """Cooperates if this player is in a good-enough mood. Betrays otherwise.
+    #
+    #     Will also update this player's current mood based on the previous round (if
+    #     the current round is higher than 1).
+    #     """
+    #     mood_threshold = self.mood_threshold
+    #     mood = self.mood
+    #
+    #     # Very unsure about this implementation
+    #     # If mood goes above the threshold once, it will never come back down
+    #     if mood < mood_threshold:
+    #         if mood - (10 / game.curr_round) >= 0:
+    #             mood -= 10 / game.curr_round
+    #         return True
+    #     else:
+    #         if mood + (10 / game.curr_round) <= 100:
+    #             mood += (10 / game.curr_round)
+    #         return False
 
     def make_move(self, game: PDGame) -> bool:
         """Cooperates if this player is in a good-enough mood. Betrays otherwise.
@@ -206,20 +226,36 @@ class MoodyStrategy(Strategy):
         Will also update this player's current mood based on the previous round (if
         the current round is higher than 1).
         """
-        mood_threshold = self.mood_threshold
-        mood = self.mood
-
-        # Very unsure about this implementation
-        # If mood goes above the threshold once, it will never come back down
-        if mood < mood_threshold:
-            if mood - (10 / game.curr_round) >= 0:
-                mood -= 10 / game.curr_round
+        # will cooperate first round as mood will be 0
+        mood = self.get_mood(game)
+        if mood >= 0:
             return True
         else:
-            if mood + (10 / game.curr_round) <= 100:
-                mood += (10 / game.curr_round)
             return False
 
+    def get_mood(self, game: PDGame) -> int:
+        """Return current mood for moody"""
+        current_mood = 0
+        opponent = self.get_opponent_num(game)
+        if opponent == 0:
+            moody = 1
+        else:
+            moody = 0
+
+        # go through all the rounds of the game and sum up current mood
+        for round_num in game.decisions:
+            if game.decisions[round_num][opponent] is True:
+                # if opponent cooperates, mood is better
+                current_mood += 5
+            else:  # the opponent betrays
+                if round_num > 1 and game.decisions[round_num - 1][opponent] is False \
+                        and game.decisions[round_num - 1][moody] is True:
+                    # if the opponent betrayed while moody cooperates, he is extra mad
+                    current_mood -= 15
+                else:
+                    current_mood -= 10
+
+        return current_mood
 
 class PavlovStrategy(Strategy):
     """A strategy that cooperates if the opponent makes the same move as it, betrays otherwise.
