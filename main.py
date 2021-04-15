@@ -15,8 +15,9 @@ class Main:
     def run_game(self, game: PDGame, player1: Player, player2: Player) -> None:
         """Run a game between two computer strategies.
         """
-        player1.player_num = 1
-        player2.player_num = 2
+        # player1.player_num = 1
+        # player2.player_num = 2
+
 
         for i in range(0, game.num_rounds):
             game.is_p1_turn = True
@@ -55,11 +56,13 @@ class Main:
         between the strategies.
         """
         all_strategies = get_all_strategies()
+        # TODO: Change
+        all_strategies_except_ai = get_all_strategies().copy().remove('Learning Strategy')
         if not show_heatmap:
             for strategy1 in all_strategies:
                 new_game = PDGame(game.num_rounds)
                 player1 = Player(strategy1, 1)
-                for strategy2 in all_strategies:
+                for strategy2 in all_strategies_except_ai:
                     player2 = Player(strategy2, 2)
                     self.run_game(new_game, player1, player2)
         else:
