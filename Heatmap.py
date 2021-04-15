@@ -15,6 +15,9 @@ def create_example_heatmap():
 
 
 def unpack_graph(graph: WeightedGraph) -> dict:
+    """
+    Takes graph and returns a dictionary with data used to create a heatmap
+    """
     data, x_labels, y_labels = [], [], []
 
     # Generate all axis titles
@@ -40,7 +43,7 @@ def unpack_graph(graph: WeightedGraph) -> dict:
     return results
 
 
-def create_heatmap(input_data, x_axis, y_axis):
+def create_heatmap(input_data: list, x_axis: list, y_axis: list) -> None:
     fig = px.imshow(input_data,
                     labels=dict(x="Strategy", y="Opponent", color="Win Rate (%)"),
                     x=x_axis,
