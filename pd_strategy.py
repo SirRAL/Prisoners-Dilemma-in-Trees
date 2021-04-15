@@ -319,7 +319,7 @@ class LearningStrategy(Strategy):
         Run this after every game.
         """
         # updates the leaf representing the final round with the actual points gained
-        self._temp_tree.avg_pts_gained = game.get_points(1)
+        self._temp_tree.avg_pts_gained = game.get_points_prev(1)
         # update avg_pts_gained for all nodes in the tree
         self._game_tree.update_after_game(game)
         # reset temp_tree
