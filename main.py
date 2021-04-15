@@ -66,6 +66,17 @@ class Main:
                     self.run_game(new_game, player1, player2)
         else:
             graph = WeightedGraph()
+            for strategy1 in all_strategies:
+                new_game = PDGame(game.num_rounds)
+                player1 = Player(strategy1, 1)
+                graph.add_vertex(player1.strategy.name)
+                for strategy2 in all_strategies_except_ai:
+                    player2 = Player(strategy2, 2)
+                    graph.add_vertex(player2.strategy.name)
+                    self.run_game(new_game, player1, player2)
+                    graph.add_edge((player1.strategy.name, player1.curr_points),
+                                   (player2.strategy.name, player2.curr_points))
+
 
 
     def resolve_round(self, decision1: bool, decision2: bool) -> None:
