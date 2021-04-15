@@ -30,3 +30,4 @@ class Player:
         """Return True if this player cooperates, and False otherwise.
         """
         return self.strategy.make_move(game)
+
