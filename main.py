@@ -11,9 +11,6 @@ from player import Player
 def run_game(game: PDGame, player1: Player, player2: Player) -> None:
     """Run a game between two computer strategies.
     """
-    # player1.player_num = 1
-    # player2.player_num = 2
-
     for _ in range(0, game.num_rounds):
         game.is_p1_turn = True
         move1 = player1.make_move(game)
@@ -32,7 +29,7 @@ def run_game(game: PDGame, player1: Player, player2: Player) -> None:
         game.curr_round += 1
 
 
-def run_user_game(self, game: PDGame, player2: Player) -> None:
+def run_user_game(game: PDGame, player2: Player) -> None:
     """Run a game between a user and a computer strategy.
     """
     user = Player(strategy=None, player_num=1)
@@ -50,7 +47,7 @@ def run_user_game(self, game: PDGame, player2: Player) -> None:
         game.curr_round += 1
 
 
-def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
+def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
     """Run a tournament between all strategies.
 
     If <show_heatmap> is set, then display a heatmap that shows the match-ups
@@ -64,7 +61,7 @@ def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
             player1 = Player(strategy1, 1)
             for strategy2 in all_strategies_except_ai:
                 player2 = Player(strategy2, 2)
-                self.run_game(new_game, player1, player2)
+                run_game(new_game, player1, player2)
     else:
         graph = WeightedGraph()
         for strategy1 in all_strategies:
@@ -74,12 +71,12 @@ def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
             for strategy2 in all_strategies_except_ai:
                 player2 = Player(strategy2, 2)
                 graph.add_vertex(player2.strategy.name)
-                self.run_game(new_game, player1, player2)
+                run_game(new_game, player1, player2)
                 graph.add_edge((player1.strategy.name, player1.curr_points),
                                (player2.strategy.name, player2.curr_points))
 
 
-def get_trained_learner(player2: Player) -> Player:
+def get_trained_learner(player2: Player, num_rounds: int) -> Player:
     """Return a "trained" Player using a LearningStrategy against another Player using
     a specific Strategy.
 
@@ -94,7 +91,7 @@ def get_trained_learner(player2: Player) -> Player:
 
     for i in range(num_games):
         learner._exploration_chance = 1.0 - (i / num_games)
-        game = PDGame(15)
+        game = PDGame(num_rounds)
         run_game(game, learner_player, player2)
         learner.update_game_tree_after_game(game)
 
