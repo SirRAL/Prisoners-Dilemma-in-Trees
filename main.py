@@ -2,6 +2,7 @@
 
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
+import pd_strategy
 
 
 class Main:
@@ -11,7 +12,7 @@ class Main:
     def run_game(self) -> None:
         """Run a game between two computer strategies.
         """
-        # TODO: implement this function
+        learner =
 
     def run_user_game(self) -> None:
         """Run a game between a user and a computer strategy.

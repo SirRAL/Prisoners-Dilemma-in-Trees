@@ -3,7 +3,11 @@
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
 from pd_game import PDGame
+from game_tree import GameTree
+from typing import Optional
 import random
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 
 class Strategy:
@@ -244,3 +248,129 @@ class PavlovStrategy(Strategy):
             if prev_move_tuple[0] == prev_move_tuple[1]:  # Check move equality
                 return True
             return False
+
+
+class LearningStrategy(Strategy):
+    """A strategy which adapts to its opponent's strategy.
+    """
+    _game_tree: GameTree
+    _temp_tree: GameTree
+    _exploration_chance: float
+
+    def __init__(self, exploration_chance: float, game_tree: GameTree = GameTree()) -> None:
+        self._game_tree = game_tree
+        self._temp_tree = self._game_tree
+        self._exploration_chance = exploration_chance
+
+    def update_game_tree_after_round(self, game: PDGame) -> None:
+        """Update game_tree to the latest information, as well as update
+        temp_tree to have the most recent moves as its root.
+
+        Run this after every round.
+        """
+        # Because self._temp_tree references self._game_tree,
+        # mutating self._temp_tree in this way will also mutate self._game_tree.
+        self._temp_tree.update_after_round(game)
+        self._temp_tree = self._temp_tree.find_subtree_by_moves(game.decisions[game.curr_round])
+
+    def update_game_tree_after_game(self, game: PDGame) -> None:
+        """Update game_tree to the latest information, as well as reset temp_tree.
+
+        Run this after every game.
+        """
+        # updates the leaf representing the final round with the actual points gained
+        self._temp_tree.avg_pts_gained = game.get_points(1)
+        # update avg_pts_gained for all nodes in the tree
+        self._game_tree.update_after_game(game)
+        # reset temp_tree
+        self._temp_tree = self._game_tree
+
+    def make_move(self, game: PDGame) -> bool:
+        """Make a decision based on the "best" decision as decided by its tree, or make
+        a random move if it is learning.
+        """
+        if self._temp_tree.get_subtrees() == []:
+            return self._get_random_move()
+
+        # random float which determines if player will explore
+        rand_check = random.uniform(0, 1)
+
+        # explore
+        if rand_check < self._exploration_chance:
+            return self._get_random_move()
+        # don't explore
+        else:
+            return self._temp_tree.get_best_move()
+
+    def _get_random_move(self) -> bool:
+        """Return a random decision.
+        """
+        return random.choice([True, False])
+
+
+def plot_game_statistics(results: list[str]) -> None:
+    """Plot the outcomes and points won for each player for a given list of PD game results.
+    """
+    outcomes = [1 if result == 'White' else 0 for result in results]
+
+    cumulative_win_probability = [sum(outcomes[0:i]) / i for i in range(1, len(outcomes) + 1)]
+    rolling_win_probability = \
+        [sum(outcomes[max(i - 50, 0):i]) / min(50, i) for i in range(1, len(outcomes) + 1)]
+
+    fig = make_subplots(rows=2, cols=1)
+    fig.add_trace(go.Scatter(y=outcomes, mode='markers',
+                             name='Outcome (1 = White win, 0 = Draw/Black win)'),
+                  row=1, col=1)
+    fig.add_trace(go.Scatter(y=cumulative_win_probability, mode='lines',
+                             name='White win percentage (cumulative)'),
+                  row=2, col=1)
+    fig.add_trace(go.Scatter(y=rolling_win_probability, mode='lines',
+                             name='White win percentage (most recent 50 games)'),
+                  row=2, col=1)
+    fig.update_yaxes(range=[0.0, 1.0], row=2, col=1)
+
+    fig.update_layout(title='Minichess Game Results', xaxis_title='Game')
+    fig.show()
+
+
+def test(self):
+    """Test"""
+    strat = LearningStrategy(0)
+
+    # game 1
+    game = PDGame(2)
+    move = strat.make_move(game)
+    game.decisions[game.curr_round] = (True, True)
+    strat.update_game_tree_after_round(game)
+    game.curr_round += 1
+
+    move = strat.make_move(game)
+    game.decisions[game.curr_round] = (True, False)
+    strat.update_game_tree_after_round(game)
+    strat.update_game_tree_after_game(game)
+
+    # game 2
+    game = PDGame(2)
+    move = strat.make_move(game)
+    game.decisions[game.curr_round] = (True, True)
+    strat.update_game_tree_after_round(game)
+    game.curr_round += 1
+
+    move = strat.make_move(game)
+    game.decisions[game.curr_round] = (True, True)
+    strat.update_game_tree_after_round(game)
+    strat.update_game_tree_after_game(game)
+
+    # game 3
+    game = PDGame(2)
+    move = strat.make_move(game)
+    game.decisions[game.curr_round] = (False, True)
+    strat.update_game_tree_after_round(game)
+    game.curr_round += 1
+
+    move = strat.make_move(game)
+    game.decisions[game.curr_round] = (False, False)
+    strat.update_game_tree_after_round(game)
+    strat.update_game_tree_after_game(game)
+
+
