@@ -331,6 +331,8 @@ class LearningStrategy(Strategy):
     _exploration_chance: float
 
     def __init__(self, exploration_chance: float, game_tree: GameTree = GameTree()) -> None:
+        self.name = 'Learning Strategy'
+        self.desc = 'Chooses decisions based on what it believes will net it the most points.'
         self._game_tree = game_tree
         self._temp_tree = self._game_tree
         self._exploration_chance = exploration_chance
