@@ -2,7 +2,7 @@
 
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
-from pd_strategy import Strategy
+from pd_strategy import Strategy, get_all_strategies
 from pd_game import PDGame
 from Graph import WeightedGraph
 from player import Player
@@ -14,10 +14,13 @@ class Main:
     def run_game(self, game: PDGame, player1: Player, player2: Player) -> None:
         """Run a game between two computer strategies.
         """
-        # while game.curr_round <= game.num_rounds ?
+        player1.player_num = 1
+        player2.player_num = 2
+
         for i in range(0, game.num_rounds):
-            # How do we update is_p1_turn ??
+            game.is_p1_turn = True
             move1 = player1.make_move(game)
+            game.is_p1_turn = False
             move2 = player2.make_move(game)
 
             round_results = game.resolve_points(move1, move2)
@@ -39,7 +42,9 @@ class Main:
         If <show_heatmap> is set, then display a heatmap that shows the match-ups
         between the strategies.
         """
-        all_strategies = []
+        all_strategies = get_all_strategies()
+
+
 
     # def resolve_round(self, decision1: bool, decision2: bool) -> None:
     #     """Takes Player 1's decision and Player 2's decision, determines
