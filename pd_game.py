@@ -50,10 +50,18 @@ class PDGame:
             decisions = self.decisions[round_num]
             return self.resolve_points(decisions[0], decisions[1])
 
-    def get_points(self, player_num: int) -> int:
+    # def get_points(self, player_num: int) -> int:
+    #     """Returns the number of points gained by the specified player up to the
+    #     current round.
+    #     """
+    #     return sum(self.resolve_round(round_num)[player_num - 1]
+    #                for round_num in range(1, self.curr_round + 1)
+    #                )
+
+    def get_points_prev(self, player_num: int) -> int:
         """Returns the number of points gained by the specified player up to the
-        current round.
+        previous round.
         """
         return sum(self.resolve_round(round_num)[player_num - 1]
-                   for round_num in range(1, self.curr_round + 1)
+                   for round_num in range(1, self.curr_round)
                    )
