@@ -2,13 +2,14 @@
 
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
-from pd_strategy import Strategy, get_all_strategies
+from pd_strategy import get_all_strategies
 from pd_game import PDGame
 from Graph import WeightedGraph
 from player import Player
+from Heatmap import display_heatmap
 
 
-def run_game(self, game: PDGame, player1: Player, player2: Player) -> None:
+def run_game(game: PDGame, player1: Player, player2: Player) -> None:
     """Run a game between two computer strategies.
     """
     # player1.player_num = 1
@@ -28,7 +29,7 @@ def run_game(self, game: PDGame, player1: Player, player2: Player) -> None:
         game.curr_round += 1
 
 
-def run_user_game(self, game: PDGame, player2: Player) -> None:
+def run_user_game(game: PDGame, player2: Player) -> None:
     """Run a game between a user and a computer strategy.
     """
     user = Player(strategy=None, player_num=1)
@@ -46,7 +47,7 @@ def run_user_game(self, game: PDGame, player2: Player) -> None:
         game.curr_round += 1
 
 
-def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
+def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
     """Run a tournament between all strategies.
 
     If <show_heatmap> is set, then display a heatmap that shows the match-ups
@@ -60,16 +61,17 @@ def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
             player1 = Player(strategy1, 1)
             for strategy2 in all_strategies_except_ai:
                 player2 = Player(strategy2, 2)
-                self.run_game(new_game, player1, player2)
+                run_game(new_game, player1, player2)
     else:
         graph = WeightedGraph()
         for strategy1 in all_strategies:
             new_game = PDGame(game.num_rounds)
             player1 = Player(strategy1, 1)
             graph.add_vertex(player1.strategy.name)
-            for strategy2 in all_strategies_except_ai:
+            for strategy2 in all_strategies:
                 player2 = Player(strategy2, 2)
                 graph.add_vertex(player2.strategy.name)
-                self.run_game(new_game, player1, player2)
+                run_game(new_game, player1, player2)
                 graph.add_edge((player1.strategy.name, player1.curr_points),
                                (player2.strategy.name, player2.curr_points))
+        display_heatmap(graph)
