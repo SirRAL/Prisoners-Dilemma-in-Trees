@@ -2,6 +2,7 @@
 
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
+from __future__ import annotations
 import pd_strategy
 from pd_game import PDGame
 from typing import Optional
@@ -26,6 +27,11 @@ class Player:
         self.curr_points = 0
         self.strategy = strategy
         self.player_num = player_num
+
+    def __copy__(self) -> Player:
+        """Create a new copy of this Player.
+        """
+        return Player(self.strategy.__copy__(), self.player_num)
 
     def make_move(self, game: PDGame) -> bool:
         """Return True if this player cooperates, and False otherwise.

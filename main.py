@@ -5,27 +5,70 @@ Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 
 # from pd_strategy import JesusStrategy, LuciferStrategy, TitForTatStrategy, GrimStrategy, \
 #     ProbabilityStrategy, MoodyStrategy, PavlovStrategy
-from tkinter import Tk, Label, Button, Entry, Frame, OptionMenu, StringVar, ttk, Listbox
+from tkinter import Tk, Label, Button, Entry, Frame, OptionMenu, StringVar, ttk, Listbox, messagebox
 from typing import Any, Callable
-from pd_strategy import Strategy, get_all_strategies
+from pd_strategy import get_all_strategies, LearningStrategy, JesusStrategy
 from pd_game import PDGame
 from Graph import WeightedGraph
 from player import Player
-from copy import copy
+import time
 
-# TODO: ADD LEARNING AI TO LIST OF STRATEGIES TO BE CHOSEN IN AI vs. AI
-# Perhaps only allow LearningStrategy to be chosen for Player 1
+def get_trained_learner(player2: Player, num_rounds: int) -> Player:
+    """Return a "trained" Player using a LearningStrategy against another Player using
+    a specific Strategy.
 
-def run_game(num_rounds: int, player1: Player, player2: Player) -> None:
+    Preconditions:
+      - player2.player_num == 2
+    """
+    num_games = 300
+    exploration_chance = 1.0
+
+    learner = LearningStrategy(exploration_chance)
+    learner_player = Player(learner, 1)
+
+    for i in range(num_games):
+        learner._exploration_chance = 1.0 - (i / num_games)
+        game = PDGame(num_rounds)
+        run_game(game, learner_player, player2)
+        learner.update_game_tree_after_game(game)
+
+        learner_player.curr_points = 0
+        player2.curr_points = 0
+
+    return learner_player
+
+
+def run_game(game: PDGame, player1: Player, player2: Player) -> None:
     """Run a game between two computer strategies.
     """
-    # player1.player_num = 1
-    # player2.player_num = 2
+    for _ in range(0, game.num_rounds):
+        game.is_p1_turn = True
+        move1 = player1.make_move(game)
+        game.is_p1_turn = False
+        move2 = player2.make_move(game)
+
+        round_results = game.resolve_points(move1, move2)
+        player1.curr_points += round_results[0]
+        player2.curr_points += round_results[1]
+
+        game.decisions[game.curr_round] = (move1, move2)
+
+        if isinstance(player1.strategy, LearningStrategy):
+            player1.strategy.update_game_tree_after_round(game)
+
+        game.curr_round += 1
+
+
+def create_and_run_game(num_rounds: int, player1: Player, player2: Player) -> None:
+    """Create and run a new (non-persistent) game between two computer strategies.
+    """
+
+    if isinstance(player1.strategy, LearningStrategy):
+        player1 = get_trained_learner(player2, num_rounds)
 
     game = PDGame(num_rounds)
 
-    for i in range(0, game.num_rounds):
-
+    for _ in range(0, game.num_rounds):
         game.is_p1_turn = True
         move1 = player1.make_move(game)
         game.is_p1_turn = False
@@ -73,6 +116,7 @@ def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
 def run_user_game(game: PDGame, player2: Player) -> None:
     """Run a game between a user and a computer strategy.
     """
+    player_vs_ai_interface(game)
     user = Player(strategy=None, player_num=1)
     for _ in range(0, game.num_rounds):
         game.is_p1_turn = True
@@ -176,7 +220,7 @@ def draw_ai_vs_ai() -> None:
     instructions2 = Label(input_frame, text='Number of rounds to be played: ')
     instructions2.grid(row=1, column=1)
 
-    num_rounds_possible = [str(x) for x in range(10, 40)]
+    num_rounds_possible = [str(x) for x in range(10, 26)]
     num_rounds = StringVar(root)
     num_rounds.set(num_rounds_possible[0])
     input_field = ttk.Combobox(input_frame, textvariable=num_rounds, values=num_rounds_possible,
@@ -186,13 +230,11 @@ def draw_ai_vs_ai() -> None:
     def update_num_rounds(event=None) -> None:
         if event is None:
             pass
-        # num_rounds.set(num_rounds)
         game_change_rounds()
 
     input_field.bind('<<ComboboxSelected>>', update_num_rounds)
 
     # Matchup label
-
     matchup_label = Label(root, text='Matchup: ')
     matchup_label.grid(row=4, column=2, pady=15)
 
@@ -206,15 +248,14 @@ def draw_ai_vs_ai() -> None:
     pavlov = get_all_strategies()[6]()
     learning = get_all_strategies()[7](0)
 
-
     # initialize strategy info
-
-    strategies = [jesus, lucifer, tit_for_tat, grim, probability, moody, pavlov, learning]
-    strategy_names = [strategy.name for strategy in strategies]
-    name_to_desc = {strategy.name: strategy.desc for strategy in strategies}
+    strategies_1 = [jesus, lucifer, tit_for_tat, grim, probability, moody, pavlov, learning]
+    strategies_2 = strategies_1[:7]
+    strategy_names = [strategy.name for strategy in strategies_1]
+    strategy_names_2 = [strategy.name for strategy in strategies_2]
+    name_to_desc = {strategy.name: strategy.desc for strategy in strategies_1}
 
     # create dropdown menu frame
-
     dropdown_frame = Frame(root)
     dropdown_frame.grid(row=5, column=2)
 
@@ -238,50 +279,40 @@ def draw_ai_vs_ai() -> None:
         player1_desc.configure(text=name_to_desc[player1_selection.get()])
         player2_desc.configure(text=name_to_desc[player2_selection.get()])
 
-        for strategy in strategies:
+        for strategy in strategies_1:
             if player1_selection.get() == strategy.name:
                 player1.strategy = strategy.__copy__()
             if player2_selection.get() == strategy.name:
                 player2.strategy = strategy.__copy__()
 
     # draw left dropdown menu
-
     player1_menu = ttk.Combobox(dropdown_frame, textvariable=player1_selection,
                                 values=strategy_names, state='readonly')
     player1_menu.bind('<<ComboboxSelected>>', change_strategy)
-
     player1_menu.grid(row=1, column=1)
 
     # draw right dropdown menu
-
     player2_menu = ttk.Combobox(dropdown_frame, textvariable=player2_selection,
-                                values=strategy_names, state='readonly')
+                                values=strategy_names_2, state='readonly')
     player2_menu.bind('<<ComboboxSelected>>', change_strategy)
-
     player2_menu.grid(row=1, column=3)
 
     # draw the "VS"
     versus_label = Label(dropdown_frame, text='VS.', font='TkHeadingFont:')
-
     versus_label.grid(row=1, column=2, padx=30)
 
     # Back button
     back_button = Button(root, text='Back',
                          command=lambda: destroy_and_open(root, draw_main_window))
-
     back_button.grid(row=6, column=0, padx=5)
 
     player1 = Player(None, 1)
     player2 = Player(None, 2)
 
-    def initialize_game() -> PDGame:
-        rounds_to_play = int(num_rounds.get())
-        return PDGame(rounds_to_play)
-
     def game_change_rounds() -> None:
         game.num_rounds = int(num_rounds.get())
 
-    game = initialize_game()
+    game = PDGame(int(num_rounds.get()))
 
     change_strategy()
 
@@ -290,14 +321,34 @@ def draw_ai_vs_ai() -> None:
     # For example, use player1_selection and player2_selection to find which Strategy each chose,
     # and num_rounds
 
-    start_button = Button(root, text='Start!', command=lambda: run_game(int(num_rounds.get()), player1, player2), padx=10)
+    start_button = Button(root, text='Start!', command=lambda: create_and_run_game(int(num_rounds.get()), player1, player2), padx=10)
 
     start_button.grid(row=6, column=2, pady=10)
 
     root.mainloop()
 
 
-def player_vs_ai_interface(game: PDGame) -> None:
+def process_decision(decisions: dict[int, tuple[bool, bool]]) -> str:
+    """Takes in a decision dictionary and outputs the next string to put in the decision log."""
+    # Take the latest tuple and process it
+    decision_tuple = decisions[len(decisions)]
+    player_decision = decision_tuple[0]
+    opponent_decision = decision_tuple[1]
+
+    if player_decision is True:
+        result = 'You chose to cooperate.'
+    else:
+        result = 'You chose to betray.'
+
+    if opponent_decision is True:
+        result += ' Your opponent chose to cooperate.'
+    else:
+        result += ' Your opponent chose to betray.'
+
+    return result
+
+
+def player_vs_ai_interface(game: PDGame, player2: Player) -> None:
     """The interface for a player to play with a strategy AI."""
 
     root = Tk()
@@ -313,32 +364,9 @@ def player_vs_ai_interface(game: PDGame) -> None:
     decision_log_label = Label(interface_frame, text='Decision Log')
     decision_log_label.grid(row=1, column=1)
 
-    # decision list is the list of strings that will be outputted by the decision log
+    decision_dict = game.decisions
 
-    # TODO: REMOVE
-    # format from PDGame.decisions
-    decision_list = {1: (True, True), 2: (False, True), 3: (True, False)}
-
-    def process_decision(decisions: dict[int, tuple[bool, bool]]) -> str:
-        """Takes in a decision dictionary and outputs the next string to put in the decision log."""
-        # Take the latest tuple and process it
-        decision_tuple = decisions[len(decisions)]
-        player_decision = decision_tuple[0]
-        opponent_decision = decision_tuple[1]
-
-        if player_decision is True:
-            result = 'You chose to cooperate.'
-        else:
-            result = 'You chose to betray.'
-
-        if opponent_decision is True:
-            result += ' Your opponent chose to cooperate.'
-        else:
-            result += ' Your opponent chose to betray.'
-
-        return result
-
-    decisions = StringVar(value=decision_list)
+    decisions = StringVar(value=decision_dict)
     decision_log = Listbox(interface_frame, listvariable=decisions, height=20, width=75)
     decision_log.grid(row=2, column=1)
 
@@ -365,17 +393,37 @@ def player_vs_ai_interface(game: PDGame) -> None:
 
         return (str_player1_points, str_player2_points)
 
-    def insert_latest_decision() -> None:
+    def victory() -> None:
+        messagebox.showinfo('Victory!', 'Victory! \n\nPress OK to go back to the main menu.')
+        root.destroy()
+        draw_main_window()
+
+    def defeat() -> None:
+        messagebox.showinfo('Defeat!', 'You\'ve been defeated. \n\nPress OK to go back to the main menu.')
+        root.destroy()
+        draw_main_window()
+
+    def draw() -> None:
+        messagebox.showinfo('Draw!', 'Tie! \n\nPress OK to go back to the main menu.')
+        root.destroy()
+        draw_main_window()
+
+    def insert_latest_decision(user_decision: bool) -> None:
         """Inserts a string representation of the latest round into the decision log."""
-        # game.decisions = {1: (True, True), 2: (False, True), 3: (True, False), 4: (False, False)}
-        # TODO: REMOVE
-        game.decisions[game.curr_round] = (True, False)
 
-        decision_log.insert(len(decision_list), process_decision(game.decisions))
+        if int(game.curr_round) < int(game.num_rounds):
+            game.decisions[game.curr_round] = (user_decision, player2.strategy.make_move(game))
+            decision_log.insert(len(decision_dict), process_decision(game.decisions))
+            game.curr_round += 1
+            play_round()
 
-        # TODO MAYBE REMOVE
-        game.curr_round += 1
-        play_round()
+        if int(game.curr_round) >= int(game.num_rounds):
+            if game.resolve_game(1, 2) == 1:
+                victory()
+            elif game.resolve_game(1, 2) == 2:
+                defeat()
+            else:
+                draw()
 
     decision_window = Frame(interface_frame, bd=2)
     decision_window.grid(row=2, column=2)
@@ -383,20 +431,13 @@ def player_vs_ai_interface(game: PDGame) -> None:
     make_decision_label = Label(decision_window, text='Make Your Decision!', font='TkHeadingFont:')
     make_decision_label.grid(row=1, column=2)
 
-    cooperate_button = Button(decision_window, text='COOPERATE', command=insert_latest_decision)
+    cooperate_button = Button(decision_window, text='COOPERATE', command=lambda: insert_latest_decision(True))
     cooperate_button.grid(row=2, column=1, padx=10)
 
-    betray_button = Button(decision_window, text='BETRAY')
+    betray_button = Button(decision_window, text='BETRAY', command=lambda: insert_latest_decision(False))
     betray_button.grid(row=2, column=3, padx=10)
 
-    # TODO: REMOVE
-    # game.decisions = {1: (True, True), 2: (True, False), 3: (False, False), 4: (False, True)}
-    game.decisions = {}
-
     def play_round() -> None:
-
-        # game.decisions = {1: (True, True), 2: (True, False), 3: (False, False), 4: (False, True)}
-
         turn_label = Label(decision_window, text='Turn: ' + str(game.curr_round))
         turn_label.grid(row=3, column=2)
 
@@ -405,9 +446,7 @@ def player_vs_ai_interface(game: PDGame) -> None:
         if game.curr_round == 1:
             your_score.configure(text='Your score: 0')
             opponent_score.configure(text='Your opponent\'s score: 0')
-
         else:
-            print(game.curr_round)
             your_score.configure(text='Your score: ' + str(game.get_points_prev(1)) + ' (' +
                                       make_score_delta(game)[0] + ')')
             opponent_score.configure(text='Your opponent\'s score: ' + str(
@@ -446,12 +485,20 @@ def draw_player_vs_ai() -> None:
     instructions2 = Label(input_frame, text='Number of rounds to be played: ')
     instructions2.grid(row=1, column=1)
 
-    num_rounds_possible = [str(x) for x in range(10, 40)]
+    num_rounds_possible = [str(x) for x in range(10, 26)]
     num_rounds = StringVar(root)
     num_rounds.set(num_rounds_possible[0])
     input_field = ttk.Combobox(input_frame, textvariable=num_rounds, values=num_rounds_possible,
                                state='readonly')
     input_field.grid(row=2, column=1, pady=10)
+
+    def update_rounds(event=None) -> None:
+        """Updates the PDGame num_rounds to the latest version from the dropmenu."""
+        if event is None:
+            pass
+        game.num_rounds = int(num_rounds.get())
+
+    input_field.bind('<<ComboboxSelected>>', update_rounds)
 
     # dropdown menus
 
@@ -489,6 +536,10 @@ def draw_player_vs_ai() -> None:
             pass
         player2_desc.configure(text=name_to_desc[player2_selection.get()])
 
+        for strategy in strategies:
+            if player2_selection.get() == strategy.name:
+                player2.strategy = strategy.__copy__()
+
     # draw YOU label
     you_label = Label(dropdown_frame, text='You')
     you_label.grid(row=1, column=1)
@@ -511,13 +562,19 @@ def draw_player_vs_ai() -> None:
 
     back_button.grid(row=6, column=0, padx=5)
 
+    game = PDGame(num_rounds.get())
+    game.is_p1_turn = False
+
+    # default opponent to JesusStrategy
+    player2 = Player(JesusStrategy(), 2)
+
     # start button
     # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
     # For example, use player1_selection and player2_selection to find which Strategy each chose
     # and num_rounds
     # Actually, call the runner, which will call the player vs. ai interface and pass in a game
     start_button = Button(root, text='Start!',
-                          command=lambda: destroy_and_open(root, player_vs_ai_interface(PDGame(num_rounds.get()))),
+                          command=lambda: destroy_and_open(root, lambda: player_vs_ai_interface(game, player2)),
                           padx=10, pady=0)
     start_button.grid(row=6, column=2, pady=10)
 
