@@ -57,17 +57,16 @@ def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
     all_strategies_except_ai = get_all_strategies()[:7]
     if not show_heatmap:
         for strategy1 in all_strategies:
-            new_game = PDGame(game.num_rounds)
-            player1 = Player(strategy1, 1)
             for strategy2 in all_strategies_except_ai:
+                new_game = PDGame(game.num_rounds)
+                player1 = Player(strategy1, 1)
                 player2 = Player(strategy2, 2)
                 run_game(new_game, player1, player2)
     else:
         graph = WeightedGraph()
         for strategy1 in all_strategies:
-            new_game = PDGame(game.num_rounds)
-
             for strategy2 in all_strategies:
+                new_game = PDGame(game.num_rounds)
                 player1 = Player(strategy1, 1)
                 graph.add_vertex(player1.strategy.name)
                 player2 = Player(strategy2, 2)
