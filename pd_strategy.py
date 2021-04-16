@@ -16,6 +16,7 @@ def get_all_strategies() -> list:
     return [JesusStrategy(), LuciferStrategy(), TitForTatStrategy(),
             GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
             PavlovStrategy()]
+    # return [GrimStrategy()]
 
 class Strategy:
     """A PD strategy algorithm which dictates what decisions to make.

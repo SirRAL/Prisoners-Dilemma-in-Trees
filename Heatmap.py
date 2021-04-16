@@ -31,15 +31,14 @@ def unpack_graph(graph: WeightedGraph) -> dict:
     for i in range(0, len(y_labels)):
         data.append([])
         for item in x_labels:
-            # if item == y_labels[i]:
-            #     data[i].append(0)
-            # else:
             score = graph.get_weight(item, y_labels[i])
             data[i].append(score[item])
 
     results = {'data': data,
                'x values': x_labels,
                'y values': y_labels}
+
+    print (results)
     return results
 
 
