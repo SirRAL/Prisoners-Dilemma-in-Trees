@@ -1,5 +1,8 @@
 """CSC111 Winter 2021 Final Project
 
+Module Description
+==================
+
 This module includes Strategy and its derived classes, which represent strategies used
 to make decisions in a game of Prisoner's Dilemma.
 

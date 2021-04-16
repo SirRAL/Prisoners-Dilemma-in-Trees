@@ -1,5 +1,8 @@
 """CSC111 Winter 2021 Final Project
 
+Module Description
+==================
+
 This module handles the creation and use of graphs to store results of a tournament
 between many AI strategies in games of Prisoner's Dilemma.
 

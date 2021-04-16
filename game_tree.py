@@ -1,5 +1,8 @@
 """CSC111 Winter 2021 Final Project
 
+Module Description
+==================
+
 This module handles the creation and handling of the tree which handles decision-making for
 the LearningStrategy.
 

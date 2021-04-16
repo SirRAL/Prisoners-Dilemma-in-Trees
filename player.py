@@ -1,5 +1,8 @@
 """CSC111 Winter 2021 Final Project
 
+Module Description
+==================
+
 This module handles Player, which represents any decision-maker in a game of
 Prisoner's Dilemma.
 

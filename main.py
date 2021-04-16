@@ -1,5 +1,8 @@
 """CSC111 Winter 2021 Final Project
 
+Module Description
+==================
+
 This module handles the main functionality of running a game of Prisoner's Dilemma,
 including displaying and handling the user interface (UI).
 
