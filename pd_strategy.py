@@ -118,16 +118,16 @@ class GrimStrategy(Strategy):
     """A strategy that cooperates until its opponent has betrayed once, and betrays
     the rest of the game.
     """
-    # Private Instance Attributes:
-    #   - _been_betrayed: True if this player has been betrayed before, False otherwise
-
-    _been_betrayed: bool
-
     def __init__(self) -> None:
         self.name = 'Grim Strategy'
         self.desc = 'Cooperates until its opponent has betrayed \n' \
                     ' once, and betrays the rest of the game.'
-        self._been_betrayed = False
+
+    def _been_betrayed(self, game: PDGame) -> bool:
+        """Return whether the opponent has betrayed this game or not.
+        """
+        return False in [decision[self.get_opponent_num(game)] for decision in
+                         game.decisions.values()]
 
     def make_move(self, game: PDGame) -> bool:
         """Cooperates until its opponent has betrayed once, and betrays the rest of the game.
@@ -140,15 +140,11 @@ class GrimStrategy(Strategy):
         # always cooperates on round 1 (required since we can't check prev decisions)
         if curr_round == 1:
             return True
-        elif self._been_betrayed:
+
+        if self._been_betrayed(game):
             return False
         else:
-            prev_move = self.get_opponent_prev_move(game)
-            if prev_move is False:
-                self._been_betrayed = True
-                return False
-            else:
-                return True
+            return True
 
             # Version without self.assgined_player
 

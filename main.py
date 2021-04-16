@@ -80,6 +80,10 @@ def create_and_run_game(num_rounds: int, player1: Player, player2: Player) -> No
         player2.curr_points += round_results[1]
 
         game.decisions[game.curr_round] = (move1, move2)
+
+        if isinstance(player1.strategy, LearningStrategy):
+            player1.strategy.update_game_tree_after_round(game)
+
         game.curr_round += 1
 
     ai_vs_ai_summary_screen(game, player1, player2)

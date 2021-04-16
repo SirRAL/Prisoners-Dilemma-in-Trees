@@ -62,8 +62,6 @@ class PDGame:
         """Returns the winner of this game. If a tie, returns 3."""
         player1_score = self.get_points_prev(player1_num)
         player2_score = self.get_points_prev(player2_num)
-        print(player1_score)
-        print(player2_score)
         if player1_score > player2_score:
             return 1
         elif player1_score < player2_score:
