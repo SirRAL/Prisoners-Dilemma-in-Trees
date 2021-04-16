@@ -10,6 +10,7 @@ from Graph import WeightedGraph
 from player import Player
 from Heatmap import display_heatmap
 
+
 def get_trained_learner(player2: Player, num_rounds: int) -> Player:
     """Return a "trained" Player using a LearningStrategy against another Player using
     a specific Strategy.
@@ -82,7 +83,7 @@ def create_and_run_game(num_rounds: int, player1: Player, player2: Player) -> No
         game.decisions[game.curr_round] = (move1, move2)
         game.curr_round += 1
 
-    ai_vs_ai_summary_screen(game)
+    ai_vs_ai_summary_screen(game, player1, player2)
 
 
 def run_tournament(game: PDGame) -> None:
@@ -237,12 +238,13 @@ def draw_ai_vs_ai() -> None:
                                state='readonly')
     input_field.grid(row=2, column=1, pady=10)
 
-    def update_num_rounds(event=None) -> None:
-        if event is None:
-            pass
-        game_change_rounds()
+    game = PDGame(int(num_rounds.get()))
+    game.is_p1_turn = False
 
-    input_field.bind('<<ComboboxSelected>>', update_num_rounds)
+    def game_change_rounds() -> None:
+        game.num_rounds = int(num_rounds.get())
+
+    input_field.bind('<<ComboboxSelected>>', game_change_rounds())
 
     # Matchup label
     matchup_label = Label(root, text='Matchup: ')
@@ -316,22 +318,13 @@ def draw_ai_vs_ai() -> None:
                          command=lambda: destroy_and_open(root, draw_main_window))
     back_button.grid(row=6, column=0, padx=5)
 
-    player1 = Player(None, 1)
-    player2 = Player(None, 2)
-
-    def game_change_rounds() -> None:
-        game.num_rounds = int(num_rounds.get())
-
-    game = PDGame(int(num_rounds.get()))
+    player1 = Player(JesusStrategy(), 1)
+    player2 = Player(JesusStrategy(), 2)
 
     change_strategy()
 
     # start button
-    # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
-    # For example, use player1_selection and player2_selection to find which Strategy each chose,
-    # and num_rounds
-
-    start_button = Button(root, text='Start!', command=lambda: create_and_run_game(int(num_rounds.get()), player1, player2), padx=10)
+    start_button = Button(root, text='Start!', command=lambda: destroy_and_open(root, lambda: create_and_run_game(int(num_rounds.get()), player1, player2)), padx=10)
 
     start_button.grid(row=6, column=2, pady=10)
 
@@ -642,13 +635,17 @@ def draw_battle_royale() -> None:
     root.mainloop()
 
 
-def ai_vs_ai_summary_screen(game: PDGame) -> None:
+def ai_vs_ai_summary_screen(game: PDGame, player1: Player, player2: Player) -> None:
     """Displays the summary of the aftermath of an AI vs AI game.
     """
     root = Tk()
+
+    strategy_1 = player1.strategy.name
+    strategy_2 = player2.strategy.name
+
     root.resizable(False, False)
     root.title('AI vs. AI Summary')
-    title_label = Label(root, text='AI vs. AI Game Summary', font='TkHeadingFont:')
+    title_label = Label(root, text=strategy_1 + ' vs. ' + strategy_2 + ' AI Game Summary', font='TkHeadingFont:')
     title_label.grid(row=1, column=2, pady=15)
 
     # interface_frame is high level frame
@@ -659,9 +656,15 @@ def ai_vs_ai_summary_screen(game: PDGame) -> None:
     match_summary_label.grid(row=1, column=1)
 
     statistics = ['Starting game...', 'Finishing...', 'Reporting outcomes...',
-                  'Played ' + str(game.num_rounds) + ' rounds.']
+                  'Played a total of ' + str(game.num_rounds) + ' rounds.']
 
     winner = game.resolve_game(1, 2)
+
+    player1_points = game.get_points_prev(1)
+    player2_points = game.get_points_prev(2)
+
+    statistics.append('Player 1 (' + str(strategy_1) + ') got: ' + str(player1_points) + ' points.')
+    statistics.append('Player 2 (' + str(strategy_2) + ') got: ' + str(player2_points) + ' points.')
 
     if winner == 1:
         statistics.append('Player 1 won.')
@@ -682,14 +685,14 @@ def ai_vs_ai_summary_screen(game: PDGame) -> None:
     decision_window = Frame(interface_frame, bd=2)
     decision_window.grid(row=2, column=2)
 
-    make_decision_label = Label(decision_window, text='Visualization', font='TkHeadingFont:')
+    make_decision_label = Label(decision_window, text='Other Options', font='TkHeadingFont:')
     make_decision_label.grid(row=1, column=2)
 
-    cooperate_button = Button(decision_window, text='Open Heatmap', command=...)
-    cooperate_button.grid(row=2, column=2, padx=10)
+    exit_button = Button(decision_window, text='Go Back', command=lambda: destroy_and_open(root, draw_main_window))
+    exit_button.grid(row=2, column=2, padx=10)
 
-    betray_button = Button(decision_window, text='Open Graph')
-    betray_button.grid(row=2, column=3, padx=10)
+    # betray_button = Button(decision_window, text='Open Graph')
+    # betray_button.grid(row=2, column=3, padx=10)
 
     insert_statistics()
 
@@ -709,10 +712,10 @@ def battle_royale_summary_screen(game: PDGame) -> None:
     interface_frame = Frame(root)
     interface_frame.grid(row=3, column=2)
 
-    match_summary_label = Label(interface_frame, text='Match Summary')
+    match_summary_label = Label(interface_frame, text='Log')
     match_summary_label.grid(row=1, column=1)
 
-    statistics = ['Starting game...', 'Finishing...', 'Reporting outcomes...']
+    statistics = ['Starting game...', 'Finishing...', 'Awaiting user input...']
 
     # stats_so_far = StringVar(value=statistics)
     match_summary_log = Listbox(interface_frame, height=20, width=75)
