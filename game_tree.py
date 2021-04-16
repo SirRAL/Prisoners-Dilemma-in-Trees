@@ -1,5 +1,13 @@
 """CSC111 Winter 2021 Final Project
 
+Module Description
+==================
+
+This module handles the creation and handling of the tree which handles decision-making for
+the LearningStrategy.
+
+This module is adapted from CSC111 Assignment 2: a2_game_tree.py.
+
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
 from __future__ import annotations

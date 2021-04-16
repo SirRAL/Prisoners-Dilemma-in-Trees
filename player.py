@@ -3,6 +3,9 @@
 Module Description
 ==================
 
+This module handles Player, which represents any decision-maker in a game of
+Prisoner's Dilemma.
+
 Copyright and Usage Information
 ===============================
 

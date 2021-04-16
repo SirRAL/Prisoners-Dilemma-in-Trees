@@ -3,6 +3,11 @@
 Module Description
 ==================
 
+This module handles the creation and use of graphs to store results of a tournament
+between many AI strategies in games of Prisoner's Dilemma.
+
+This module is adapted from CSC111 Assignment 3: a3_part2_recommendations.py.
+
 Copyright and Usage Information
 ===============================
 

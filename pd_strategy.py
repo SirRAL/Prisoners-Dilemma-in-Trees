@@ -3,6 +3,9 @@
 Module Description
 ==================
 
+This module includes Strategy and its derived classes, which represent strategies used
+to make decisions in a game of Prisoner's Dilemma.
+
 Copyright and Usage Information
 ===============================
 
@@ -20,7 +23,7 @@ from game_tree import GameTree
 
 
 def get_all_strategies() -> list:
-    """ Return a list of all strategies
+    """Return a list of all strategies.
     """
     return [JesusStrategy(), LuciferStrategy(), TitForTatStrategy(),
             GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
