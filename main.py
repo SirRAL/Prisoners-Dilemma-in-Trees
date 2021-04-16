@@ -239,14 +239,14 @@ def draw_ai_vs_ai() -> None:
     matchup_label.grid(row=4, column=2, pady=15)
 
     # dropdown menus
-    jesus = get_all_strategies()[0]()
-    lucifer = get_all_strategies()[1]()
-    tit_for_tat = get_all_strategies()[2]()
-    grim = get_all_strategies()[3]()
-    probability = get_all_strategies()[4](50.0)
-    moody = get_all_strategies()[5]()
-    pavlov = get_all_strategies()[6]()
-    learning = get_all_strategies()[7](0)
+    jesus = get_all_strategies()[0]
+    lucifer = get_all_strategies()[1]
+    tit_for_tat = get_all_strategies()[2]
+    grim = get_all_strategies()[3]
+    probability = get_all_strategies()[4]
+    moody = get_all_strategies()[5]
+    pavlov = get_all_strategies()[6]
+    learning = get_all_strategies()[7]
 
     # initialize strategy info
     strategies_1 = [jesus, lucifer, tit_for_tat, grim, probability, moody, pavlov, learning]
@@ -502,14 +502,13 @@ def draw_player_vs_ai() -> None:
 
     # dropdown menus
 
-    jesus = get_all_strategies()[0]()
-    lucifer = get_all_strategies()[1]()
-    tit_for_tat = get_all_strategies()[2]()
-    grim = get_all_strategies()[3]()
-    probability = get_all_strategies()[4](50.0)
-    moody = get_all_strategies()[5]()
-    pavlov = get_all_strategies()[6]()
-
+    jesus = get_all_strategies()[0]
+    lucifer = get_all_strategies()[1]
+    tit_for_tat = get_all_strategies()[2]
+    grim = get_all_strategies()[3]
+    probability = get_all_strategies()[4]
+    moody = get_all_strategies()[5]
+    pavlov = get_all_strategies()[6]
     # initialize strategy info
 
     strategies = [jesus, lucifer, tit_for_tat, grim, probability, moody, pavlov]
