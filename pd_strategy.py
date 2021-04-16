@@ -107,7 +107,7 @@ class GrimStrategy(Strategy):
     def _been_betrayed(self, game: PDGame) -> bool:
         """Return whether the opponent has betrayed this game or not.
         """
-        return False in [decision[self.get_opponent_num(game)] for decision in
+        return False in [decision[get_opponent_num(game)] for decision in
                          game.decisions.values()]
 
     def make_move(self, game: PDGame) -> bool:
@@ -125,12 +125,7 @@ class GrimStrategy(Strategy):
         if self._been_betrayed(game):
             return False
         else:
-            prev_move = get_opponent_prev_move(game)
-            if prev_move is False:
-                self._been_betrayed = True
-                return False
-            else:
-                return True
+            return True
 
     def __copy__(self) -> GrimStrategy:
         """"""
