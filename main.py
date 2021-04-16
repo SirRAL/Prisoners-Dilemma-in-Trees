@@ -40,7 +40,7 @@ def get_trained_learner(player2: Player, num_rounds: int) -> Player:
 def run_game(game: PDGame, player1: Player, player2: Player) -> None:
     """Run a game between two computer strategies.
     """
-    for _ in range(0, game.num_rounds):
+    for _ in range(0, int(game.num_rounds)):
         game.is_p1_turn = True
         move1 = player1.make_move(game)
         game.is_p1_turn = False
@@ -131,23 +131,23 @@ def run_tournament(game: PDGame) -> None:
     display_heatmap(graph)
 
 
-def run_user_game(game: PDGame, player2: Player) -> None:
-    """Run a game between a user and a computer strategy.
-    """
-    player_vs_ai_interface(game)
-    user = Player(strategy=None, player_num=1)
-    for _ in range(0, game.num_rounds):
-        game.is_p1_turn = True
-        user_move = ...  # take user input
-        game.is_p1_turn = False
-        move2 = player2.make_move(game)
-
-        round_results = game.resolve_points(user_move, move2)
-        user.curr_points += round_results[0]
-        player2.curr_points += round_results[1]
-
-        game.decisions[game.curr_round] = (user_move, move2)
-        game.curr_round += 1
+# def run_user_game(game: PDGame, player2: Player) -> None:
+#     """Run a game between a user and a computer strategy.
+#     """
+#     player_vs_ai_interface(game)
+#     user = Player(strategy=None, player_num=1)
+#     for _ in range(0, game.num_rounds):
+#         game.is_p1_turn = True
+#         user_move = ...  # take user input
+#         game.is_p1_turn = False
+#         move2 = player2.make_move(game)
+#
+#         round_results = game.resolve_points(user_move, move2)
+#         user.curr_points += round_results[0]
+#         player2.curr_points += round_results[1]
+#
+#         game.decisions[game.curr_round] = (user_move, move2)
+#         game.curr_round += 1
 
 
 def draw_main_window() -> None:
@@ -210,7 +210,6 @@ def destroy_and_open(window: Tk, function: Callable) -> Any:
     """Destroys window and calls function."""
     window.destroy()
     function()
-    print('done 2')
 
 
 def draw_ai_vs_ai() -> None:
@@ -629,6 +628,13 @@ def draw_battle_royale() -> None:
                                state='readonly')
     input_field.grid(row=2, column=1, pady=10)
 
+    game = PDGame(10)
+
+    def game_update_num_rounds() -> None:
+        game.num_rounds = int(num_rounds.get())
+
+    input_field.bind('<<ComboboxSelected>>', game_update_num_rounds())
+
     # Back button
     back_button = Button(root, text='Back',
                          command=lambda: destroy_and_open(root, draw_main_window))
@@ -675,21 +681,19 @@ def ai_vs_ai_summary_screen(game: PDGame) -> None:
     match_summary_log = Listbox(interface_frame, height=20, width=75)
     match_summary_log.grid(row=2, column=1)
 
-
     def insert_statistics() -> None:
         """Inserts string statistics into the match summary log."""
-        # match_summary_log.insert(len(statistics), [stat for stat in statistics])
         for i in range(len(statistics)):
             match_summary_log.insert(i, statistics[i])
 
     decision_window = Frame(interface_frame, bd=2)
     decision_window.grid(row=2, column=2)
 
-    make_decision_label = Label(decision_window, text='Visualizations', font='TkHeadingFont:')
+    make_decision_label = Label(decision_window, text='Visualization', font='TkHeadingFont:')
     make_decision_label.grid(row=1, column=2)
 
     cooperate_button = Button(decision_window, text='Open Heatmap', command=...)
-    cooperate_button.grid(row=2, column=1, padx=10)
+    cooperate_button.grid(row=2, column=2, padx=10)
 
     betray_button = Button(decision_window, text='Open Graph')
     betray_button.grid(row=2, column=3, padx=10)
@@ -723,21 +727,17 @@ def battle_royale_summary_screen(game: PDGame) -> None:
 
     def insert_statistics() -> None:
         """Inserts string statistics into the match summary log."""
-        # match_summary_log.insert(len(statistics), [stat for stat in statistics])
         for i in range(len(statistics)):
             match_summary_log.insert(i, statistics[i])
 
     decision_window = Frame(interface_frame, bd=2)
     decision_window.grid(row=2, column=2)
 
-    make_decision_label = Label(decision_window, text='Visualizations', font='TkHeadingFont:')
-    make_decision_label.grid(row=1, column=2)
+    visualization_label = Label(decision_window, text='Visualization', font='TkHeadingFont:')
+    visualization_label.grid(row=1, column=1)
 
-    cooperate_button = Button(decision_window, text='Open Heatmap', command=...)
-    cooperate_button.grid(row=2, column=1, padx=10)
-
-    betray_button = Button(decision_window, text='Open Graph')
-    betray_button.grid(row=2, column=3, padx=10)
+    heatmap_button = Button(decision_window, text='Open Heatmap', command=lambda: run_tournament(game))
+    heatmap_button.grid(row=2, column=1, padx=10, pady=15)
 
     insert_statistics()
 

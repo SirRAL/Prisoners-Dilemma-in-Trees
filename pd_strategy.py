@@ -15,6 +15,7 @@ def get_all_strategies() -> list:
             GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
             PavlovStrategy(), LearningStrategy(0.0)]
 
+
 class Strategy:
     """A PD strategy algorithm which dictates what decisions to make.
 
