@@ -14,6 +14,9 @@ def get_all_strategies() -> list:
     return [JesusStrategy(), LuciferStrategy(), TitForTatStrategy(),
             GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
             PavlovStrategy(), LearningStrategy(0.0)]
+    # return [JesusStrategy(), LuciferStrategy(), TitForTatStrategy(),
+    #         GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
+    #         PavlovStrategy()]
 
 
 class Strategy:
