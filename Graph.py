@@ -1,3 +1,7 @@
+"""CSC111 Winter 2021 Final Project
+
+Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
+"""
 from __future__ import annotations
 from typing import Any, Union, Tuple
 
@@ -111,29 +115,7 @@ class WeightedGraph:
         v2 = self._vertices[item2]
         return v1.neighbours.get(v2, 0)
 
-    def get_all_vertices(self):
+    def get_all_vertices(self) -> dict:
+        """ Return a dictionary containing all vertices
+        """
         return self._vertices
-
-    # Don't currently need this
-
-    # def average_weight(self, item: Any) -> float:
-    #     """Return the average weight of the edges adjacent to the vertex corresponding to item.
-    #
-    #     Raise ValueError if item does not corresponding to a vertex in the graph.
-    #     """
-    #     if item in self._vertices:
-    #         v = self._vertices[item]
-    #         return sum(v.neighbours.values()) / len(v.neighbours)
-    #     else:
-    #         raise ValueError
-
-
-def create_example():
-    example_graph = WeightedGraph()
-    example_graph.add_vertex('J')
-    example_graph.add_vertex('L')
-    example_graph.add_vertex('T')
-    example_graph.add_edge(('J', 0), ('L', 100))
-    example_graph.add_edge(('J', 50), ('T', 50))
-    example_graph.add_edge(('T', 50), ('L', 50))
-    return example_graph

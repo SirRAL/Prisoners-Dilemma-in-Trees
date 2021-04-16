@@ -12,10 +12,8 @@ from Heatmap import display_heatmap
 def run_game(game: PDGame, player1: Player, player2: Player) -> None:
     """Run a game between two computer strategies.
     """
-    # player1.player_num = 1
-    # player2.player_num = 2
 
-    for i in range(0, game.num_rounds):
+    for _ in range(0, game.num_rounds):
         game.is_p1_turn = True
         move1 = player1.make_move(game)
         game.is_p1_turn = False
@@ -53,16 +51,8 @@ def run_tournament(game: PDGame) -> None:
     If <show_heatmap> is set, then display a heatmap that shows the match-ups
     between the strategies.
     """
-    # breakpoint()
     all_strategies = get_all_strategies()
-    # if not show_heatmap:
-    #     for strategy1 in all_strategies:
-    #         for strategy2 in all_strategies_except_ai:
-    #             new_game = PDGame(game.num_rounds)
-    #             player1 = Player(strategy1, 1)
-    #             player2 = Player(strategy2, 2)
-    #             run_game(new_game, player1, player2)
-    # else:
+
     graph = WeightedGraph()
     for s1 in all_strategies:
         for s2 in all_strategies:
