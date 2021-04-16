@@ -11,8 +11,9 @@ import random
 def get_all_strategies() -> list:
     """ Return a list of all strategies
     """
-    return [JesusStrategy, LuciferStrategy, TitForTatStrategy,
-            GrimStrategy, ProbabilityStrategy, MoodyStrategy, PavlovStrategy, LearningStrategy]
+    return [JesusStrategy(), LuciferStrategy(), TitForTatStrategy(),
+            GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
+            PavlovStrategy(), LearningStrategy()]
 
 class Strategy:
     """A PD strategy algorithm which dictates what decisions to make.

@@ -38,16 +38,17 @@ def unpack_graph(graph: WeightedGraph) -> dict:
             data[i].append(score[item])
 
     results = {'data': data,
-               'x_values': x_labels,
-               'y_values': y_labels}
+               'x values': x_labels,
+               'y values': y_labels}
     return results
 
 
-def create_heatmap(input_data: list, x_axis: list, y_axis: list) -> None:
-    fig = px.imshow(input_data,
+def display_heatmap(graph: WeightedGraph) -> None:
+    unpacked_graph = unpack_graph(graph)
+    fig = px.imshow(unpacked_graph['data'],
                     labels=dict(x="Strategy", y="Opponent", color="Points"),
-                    x=x_axis,
-                    y=y_axis,
+                    x=unpacked_graph['x values'],
+                    y=unpacked_graph['y values'],
                     color_continuous_scale=['floralwhite', 'lime']
                     )
     fig.update_xaxes(side="bottom")

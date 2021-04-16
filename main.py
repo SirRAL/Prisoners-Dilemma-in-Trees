@@ -2,16 +2,13 @@
 
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
-
-# from pd_strategy import JesusStrategy, LuciferStrategy, TitForTatStrategy, GrimStrategy, \
-#     ProbabilityStrategy, MoodyStrategy, PavlovStrategy
 from tkinter import Tk, Label, Button, Entry, Frame, OptionMenu, StringVar, ttk, Listbox, messagebox
 from typing import Any, Callable
 from pd_strategy import get_all_strategies, LearningStrategy, JesusStrategy
 from pd_game import PDGame
 from Graph import WeightedGraph
 from player import Player
-import time
+from Heatmap import display_heatmap
 
 def get_trained_learner(player2: Player, num_rounds: int) -> Player:
     """Return a "trained" Player using a LearningStrategy against another Player using
@@ -19,7 +16,9 @@ def get_trained_learner(player2: Player, num_rounds: int) -> Player:
 
     Preconditions:
       - player2.player_num == 2
+
     """
+
     num_games = 300
     exploration_chance = 1.0
 
@@ -57,6 +56,7 @@ def run_game(game: PDGame, player1: Player, player2: Player) -> None:
             player1.strategy.update_game_tree_after_round(game)
 
         game.curr_round += 1
+
 
 
 def create_and_run_game(num_rounds: int, player1: Player, player2: Player) -> None:
@@ -105,7 +105,7 @@ def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
             new_game = PDGame(game.num_rounds)
             player1 = Player(strategy1, 1)
             graph.add_vertex(player1.strategy.name)
-            for strategy2 in all_strategies_except_ai:
+            for strategy2 in all_strategies:
                 player2 = Player(strategy2, 2)
                 graph.add_vertex(player2.strategy.name)
                 run_game(new_game, player1, player2)
@@ -728,3 +728,4 @@ def battle_royale_summary_screen(game: PDGame) -> None:
 
 draw_main_window()
 
+# display_heatmap(graph)
