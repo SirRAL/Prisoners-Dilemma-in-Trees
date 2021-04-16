@@ -66,9 +66,10 @@ def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
         graph = WeightedGraph()
         for strategy1 in all_strategies:
             new_game = PDGame(game.num_rounds)
-            player1 = Player(strategy1, 1)
-            graph.add_vertex(player1.strategy.name)
+
             for strategy2 in all_strategies:
+                player1 = Player(strategy1, 1)
+                graph.add_vertex(player1.strategy.name)
                 player2 = Player(strategy2, 2)
                 graph.add_vertex(player2.strategy.name)
                 run_game(new_game, player1, player2)
