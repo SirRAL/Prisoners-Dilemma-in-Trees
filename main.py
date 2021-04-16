@@ -8,7 +8,7 @@ from Graph import WeightedGraph
 from player import Player
 
 
-def run_game(self, game: PDGame, player1: Player, player2: Player) -> None:
+def run_game(game: PDGame, player1: Player, player2: Player) -> None:
     """Run a game between two computer strategies.
     """
     #
@@ -26,7 +26,7 @@ def run_game(self, game: PDGame, player1: Player, player2: Player) -> None:
         game.curr_round += 1
 
 
-def run_user_game(self, game: PDGame, player2: Player) -> None:
+def run_user_game(game: PDGame, player2: Player) -> None:
     """Run a game between a user and a computer strategy.
     """
     user = Player(strategy=None, player_num=1)
@@ -63,15 +63,8 @@ def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
         graph = WeightedGraph()
         for strategy1 in all_strategies:
             new_game = PDGame(game.num_rounds)
-<<<<<<< Updated upstream
-            player1 = Player(strategy1, 1)
-            graph.add_vertex(player1.strategy.name)
-            for strategy2 in all_strategies_except_ai:
-=======
-
             for strategy2 in all_strategies:  # change to all_strategies_except_ai
                 player1 = Player(strategy1, 1)
->>>>>>> Stashed changes
                 player2 = Player(strategy2, 2)
                 graph.add_vertex(player1.strategy.name)
                 graph.add_vertex(player2.strategy.name)
