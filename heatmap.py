@@ -41,7 +41,8 @@ def display_heatmap(graph: WeightedGraph) -> None:
                     labels=dict(x="Strategy", y="Opponent", color="Points"),
                     x=unpacked_graph['x values'],
                     y=unpacked_graph['y values'],
-                    color_continuous_scale=['floralwhite', 'lime']
+                    color_continuous_scale=['floralwhite', 'lime'],
+                    title='Tournament Results'
                     )
     fig.update_xaxes(side="bottom")
     fig.show()
