@@ -2,6 +2,7 @@
 
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
+from __future__ import annotations
 from pd_game import PDGame
 from game_tree import GameTree
 import random
@@ -12,7 +13,8 @@ def get_all_strategies() -> list:
     """
     return [JesusStrategy(), LuciferStrategy(), TitForTatStrategy(),
             GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
-            PavlovStrategy(), LearningStrategy()]
+            PavlovStrategy(), LearningStrategy(0.0)]
+
 
 class Strategy:
     """A PD strategy algorithm which dictates what decisions to make.
@@ -47,6 +49,10 @@ class Strategy:
         """Return True if this Strategy cooperates, or False if this Strategy betrays."""
         raise NotImplementedError
 
+    def __copy__(self) -> Strategy:
+        """Returns a copy of this strategy."""
+        raise NotImplementedError
+
 
 class JesusStrategy(Strategy):
     """A strategy that cooperates indefinitely.
@@ -60,6 +66,10 @@ class JesusStrategy(Strategy):
         """Always cooperate (returns True).
         """
         return True
+
+    def __copy__(self) -> JesusStrategy:
+        """"""
+        return JesusStrategy()
 
 
 class LuciferStrategy(Strategy):
@@ -75,6 +85,10 @@ class LuciferStrategy(Strategy):
         """
         return False
 
+    def __copy__(self) -> LuciferStrategy:
+        """"""
+        return LuciferStrategy()
+
 
 class TitForTatStrategy(Strategy):
     """A strategy that cooperates the first round, then reciprocates the
@@ -83,7 +97,7 @@ class TitForTatStrategy(Strategy):
 
     def __init__(self) -> None:
         self.name = 'Tit for Tat Strategy'
-        self.desc = 'Cooperate the first round, then reciprocates the ' \
+        self.desc = 'Cooperates the first round, \n then reciprocates the \n' \
                     'opponent\'s previous move indefinitely.'
 
     def make_move(self, game: PDGame) -> bool:
@@ -108,6 +122,10 @@ class TitForTatStrategy(Strategy):
             #     p1_prev_move = game.decisions[curr_round - 1][0]
             #     return p1_prev_move
 
+    def __copy__(self) -> TitForTatStrategy:
+        """"""
+        return TitForTatStrategy()
+
 
 class GrimStrategy(Strategy):
     """A strategy that cooperates until its opponent has betrayed once, and betrays
@@ -120,7 +138,8 @@ class GrimStrategy(Strategy):
 
     def __init__(self) -> None:
         self.name = 'Grim Strategy'
-        self.desc = 'Cooperates until its opponent has betrayed once, and betrays the rest of the game'
+        self.desc = 'Cooperates until its opponent has betrayed \n' \
+                    ' once, and betrays the rest of the game.'
         self._been_betrayed = False
 
     def make_move(self, game: PDGame) -> bool:
@@ -161,6 +180,10 @@ class GrimStrategy(Strategy):
             # # getting here means that the opponent did not betray yet
             # return True
 
+    def __copy__(self) -> GrimStrategy:
+        """"""
+        return GrimStrategy()
+
 
 class ProbabilityStrategy(Strategy):
     """A strategy that cooperates based on a fixed probability p.
@@ -181,6 +204,9 @@ class ProbabilityStrategy(Strategy):
             return True
         else:
             return False
+
+    def __copy__(self) -> ProbabilityStrategy:
+        return ProbabilityStrategy(self.chance_of_coop)
 
 
 class MoodyStrategy(Strategy):
@@ -265,6 +291,10 @@ class MoodyStrategy(Strategy):
 
         return current_mood
 
+    def __copy__(self) -> MoodyStrategy:
+        """"""
+        return MoodyStrategy()
+
 
 class PavlovStrategy(Strategy):
     """A strategy that cooperates if the opponent makes the same move as it, betrays otherwise.
@@ -272,7 +302,7 @@ class PavlovStrategy(Strategy):
 
     def __init__(self) -> None:
         self.name = 'Pavlov Strategy'
-        self.desc = 'Cooperates if opponent makes the same moves. Betray otherwise'
+        self.desc = 'Cooperates if its opponent makes the same moves. \n Will betray otherwise.'
 
     def make_move(self, game: PDGame) -> bool:
         """If the opponent made the same decision last round as this player, then this
@@ -289,6 +319,10 @@ class PavlovStrategy(Strategy):
             if prev_move_tuple[0] == prev_move_tuple[1]:  # Check move equality
                 return True
             return False
+
+    def __copy__(self) -> PavlovStrategy:
+        """"""
+        return PavlovStrategy()
 
 
 class LearningStrategy(Strategy):
@@ -349,3 +383,6 @@ class LearningStrategy(Strategy):
         """Return a random decision.
         """
         return random.choice([True, False])
+
+    def __copy__(self) -> LearningStrategy:
+        return LearningStrategy(self._exploration_chance)
