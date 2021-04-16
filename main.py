@@ -348,7 +348,8 @@ def player_vs_ai_interface(game: PDGame, player2: Player) -> None:
     root = Tk()
     root.resizable(False, False)
     root.title('Player vs. AI Game')
-    title_label = Label(root, text='Player vs. AI', font='TkHeadingFont:')
+    player2_name = player2.strategy.name
+    title_label = Label(root, text='You vs. ' + player2_name, font='TkHeadingFont:')
     title_label.grid(row=1, column=2, pady=15)
 
     # interface_frame is high level frame
