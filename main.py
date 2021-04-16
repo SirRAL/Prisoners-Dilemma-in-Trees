@@ -27,9 +27,6 @@ def run_game(game: PDGame, player1: Player, player2: Player) -> None:
 
         game.decisions[game.curr_round] = (move1, move2)
         game.curr_round += 1
-        if player1.strategy.name == 'Grim Strategy' and player2.strategy.name == 'Grim Strategy':
-            print (player1.strategy._been_betrayed)
-
 
 
 def run_user_game(game: PDGame, player2: Player) -> None:
@@ -50,7 +47,7 @@ def run_user_game(game: PDGame, player2: Player) -> None:
         game.curr_round += 1
 
 
-def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
+def run_tournament(game: PDGame) -> None:
     """Run a tournament between all strategies.
 
     If <show_heatmap> is set, then display a heatmap that shows the match-ups
@@ -58,7 +55,6 @@ def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
     """
     # breakpoint()
     all_strategies = get_all_strategies()
-    all_strategies_except_ai = get_all_strategies()[:7]
     # if not show_heatmap:
     #     for strategy1 in all_strategies:
     #         for strategy2 in all_strategies_except_ai:
@@ -81,9 +77,10 @@ def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
             graph.add_vertex(player2.strategy.name)
 
             run_game(new_game, player1, player2)
+            if strategy1.name == 'Learning Strategy' and strategy2.name == 'Learning Strategy':
+                player1.curr_points, player2.curr_points = 0, 0
 
             graph.add_edge((player1.strategy.name, player1.curr_points),
                            (player2.strategy.name, player2.curr_points))
-            if player1.strategy.name == 'Grim Strategy' and player2.strategy.name == 'Grim Strategy':
-                print(new_game.decisions)
+
     display_heatmap(graph)

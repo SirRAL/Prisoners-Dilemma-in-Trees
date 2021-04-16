@@ -2,16 +2,16 @@ import plotly.express as px
 from Graph import WeightedGraph
 
 
-def create_example_heatmap():
-    data = [[1, 25, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, 5, 20]]
-    fig = px.imshow(data,
-                    labels=dict(x="Day of Week", y="Time of Day", color="Win Rate"),
-                    x=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-                    y=['Morning', 'Afternoon', 'Evening'],
-                    color_continuous_scale=['floralwhite', 'lime']
-                    )
-    fig.update_xaxes(side="bottom")
-    fig.show()
+# def create_example_heatmap():
+#     data = [[1, 25, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, 5, 20]]
+#     fig = px.imshow(data,
+#                     labels=dict(x="Day of Week", y="Time of Day", color="Win Rate"),
+#                     x=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+#                     y=['Morning', 'Afternoon', 'Evening'],
+#                     color_continuous_scale=['floralwhite', 'lime']
+#                     )
+#     fig.update_xaxes(side="bottom")
+#     fig.show()
 
 
 def unpack_graph(graph: WeightedGraph) -> dict:
@@ -38,11 +38,12 @@ def unpack_graph(graph: WeightedGraph) -> dict:
                'x values': x_labels,
                'y values': y_labels}
 
-    print (results)
     return results
 
 
 def display_heatmap(graph: WeightedGraph) -> None:
+    """ Display a heatmap with data from graph
+    """
     unpacked_graph = unpack_graph(graph)
     fig = px.imshow(unpacked_graph['data'],
                     labels=dict(x="Strategy", y="Opponent", color="Points"),

@@ -11,13 +11,12 @@ import random
 def get_all_strategies() -> list:
     """ Return a list of all strategies
     """
-    # return [JesusStrategy(), LuciferStrategy(), TitForTatStrategy(),
-    #         GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
-    #         PavlovStrategy(), LearningStrategy(0.0)]
     return [JesusStrategy(), LuciferStrategy(), TitForTatStrategy(),
             GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
-            PavlovStrategy()]
-    # return [GrimStrategy()]
+            PavlovStrategy(), LearningStrategy(0.0)]
+    # return [JesusStrategy(), LuciferStrategy(), TitForTatStrategy(),
+    #         GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
+    #         PavlovStrategy()]
 
 
 class Strategy:
