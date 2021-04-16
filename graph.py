@@ -29,11 +29,6 @@ class _WeightedVertex:
         self.item = item
         self.neighbours = {}
 
-    # Do we need this??
-    # def degree(self) -> int:
-    #     """Return the degree of this vertex."""
-    #     return len(self.neighbours)
-
 
 class WeightedGraph:
     """A weighted graph used to store the results of match-ups between strategies.
