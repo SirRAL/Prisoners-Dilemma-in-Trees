@@ -3,7 +3,7 @@
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
 import plotly.express as px
-from Graph import WeightedGraph
+from graph import WeightedGraph
 
 
 def unpack_graph(graph: WeightedGraph) -> dict:
@@ -45,3 +45,19 @@ def display_heatmap(graph: WeightedGraph) -> None:
                     )
     fig.update_xaxes(side="bottom")
     fig.show()
+
+
+if __name__ == '__main__':
+    import python_ta.contracts
+    python_ta.contracts.check_all_contracts()
+
+    import doctest
+    doctest.testmod()
+
+    import python_ta
+    python_ta.check_all(config={
+        'extra-imports': ['plotly.express', 'graph'],  # the names (strs) of imported modules
+        'allowed-io': [],  # the names (strs) of functions that call print/open/input
+        'max-line-length': 100,
+        'disable': ['E1136']
+    })

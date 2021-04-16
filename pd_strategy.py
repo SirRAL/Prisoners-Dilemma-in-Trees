@@ -3,9 +3,9 @@
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
 from __future__ import annotations
+import random
 from pd_game import PDGame
 from game_tree import GameTree
-import random
 
 
 def get_all_strategies() -> list:
@@ -25,25 +25,6 @@ class Strategy:
     """
     name: str
     desc: str
-
-    def get_opponent_num(self, game: PDGame) -> int:
-        """Returns 1 if it is Player1's turn, and 0 if it is Player2's turn.
-        """
-        if game.is_p1_turn:
-            return 1
-        else:
-            return 0
-
-    def get_opponent_prev_move(self, game: PDGame) -> bool:
-        """Return the previous move done by the opponent.
-
-        Preconditions:
-          - curr_round >= 2
-        """
-        opponent_num = self.get_opponent_num(game)
-        prev_round_num = game.curr_round - 1
-        prev_move = game.decisions[prev_round_num][opponent_num]
-        return prev_move
 
     def make_move(self, game: PDGame) -> bool:
         """Return True if this Strategy cooperates, or False if this Strategy betrays."""
@@ -107,7 +88,7 @@ class TitForTatStrategy(Strategy):
         if curr_round == 1:
             return True
         else:
-            return self.get_opponent_prev_move(game)
+            return get_opponent_prev_move(game)
 
     def __copy__(self) -> TitForTatStrategy:
         """"""
@@ -143,7 +124,7 @@ class GrimStrategy(Strategy):
         elif self._been_betrayed:
             return False
         else:
-            prev_move = self.get_opponent_prev_move(game)
+            prev_move = get_opponent_prev_move(game)
             if prev_move is False:
                 self._been_betrayed = True
                 return False
@@ -179,7 +160,7 @@ class ProbabilityStrategy(Strategy):
 
     def __init__(self, chance_of_coop: float) -> None:
         self.name = 'Probability Strategy'
-        self.desc = 'Cooperates based on a fixed probability.'
+        self.desc = 'Cooperates and betrays randomly.'
         self.chance_of_coop = chance_of_coop
 
     def make_move(self, game: PDGame) -> bool:
@@ -218,28 +199,6 @@ class MoodyStrategy(Strategy):
         """
         self.name = 'Moody Strategy'
         self.desc = 'Cooperates more often if its opponent cooperates often.'
-        # self.mood = initial_mood
-        # self.mood_threshold = mood_threshold
-
-    # def make_move(self, game: PDGame) -> bool:
-    #     """Cooperates if this player is in a good-enough mood. Betrays otherwise.
-    #
-    #     Will also update this player's current mood based on the previous round (if
-    #     the current round is higher than 1).
-    #     """
-    #     mood_threshold = self.mood_threshold
-    #     mood = self.mood
-    #
-    #     # Very unsure about this implementation
-    #     # If mood goes above the threshold once, it will never come back down
-    #     if mood < mood_threshold:
-    #         if mood - (10 / game.curr_round) >= 0:
-    #             mood -= 10 / game.curr_round
-    #         return True
-    #     else:
-    #         if mood + (10 / game.curr_round) <= 100:
-    #             mood += (10 / game.curr_round)
-    #         return False
 
     def make_move(self, game: PDGame) -> bool:
         """Cooperates if this player is in a good-enough mood. Betrays otherwise.
@@ -248,35 +207,11 @@ class MoodyStrategy(Strategy):
         the current round is higher than 1).
         """
         # will cooperate first round as mood will be 0
-        mood = self.get_mood(game)
+        mood = get_mood(game)
         if mood >= 0:
             return True
         else:
             return False
-
-    def get_mood(self, game: PDGame) -> int:
-        """Return current mood for moody"""
-        current_mood = 0
-        opponent = self.get_opponent_num(game)
-        if opponent == 0:
-            moody = 1
-        else:
-            moody = 0
-
-        # go through all the rounds of the game and sum up current mood
-        for round_num in game.decisions:
-            if game.decisions[round_num][opponent] is True:
-                # if opponent cooperates, mood is better
-                current_mood += 5
-            else:  # the opponent betrays
-                if round_num > 1 and game.decisions[round_num - 1][opponent] is False \
-                        and game.decisions[round_num - 1][moody] is True:
-                    # if the opponent betrayed while moody cooperates, he is extra mad
-                    current_mood -= 15
-                else:
-                    current_mood -= 10
-
-        return current_mood
 
     def __copy__(self) -> MoodyStrategy:
         """"""
@@ -354,22 +289,85 @@ class LearningStrategy(Strategy):
         a random move if it is learning.
         """
         if self._temp_tree.get_subtrees() == []:
-            return self._get_random_move()
+            return _get_random_move()
 
         # random float which determines if player will explore
         rand_check = random.uniform(0, 1)
 
         # explore
         if rand_check < self._exploration_chance:
-            return self._get_random_move()
+            return _get_random_move()
         # don't explore
         else:
             return self._temp_tree.get_best_move()
 
-    def _get_random_move(self) -> bool:
-        """Return a random decision.
-        """
-        return random.choice([True, False])
-
     def __copy__(self) -> LearningStrategy:
         return LearningStrategy(self._exploration_chance)
+
+
+def get_opponent_prev_move(game: PDGame) -> bool:
+    """Return the previous move done by the opponent.
+
+    Preconditions:
+      - curr_round >= 2
+    """
+    opponent_num = get_opponent_num(game)
+    prev_round_num = game.curr_round - 1
+    prev_move = game.decisions[prev_round_num][opponent_num]
+    return prev_move
+
+
+def get_opponent_num(game: PDGame) -> int:
+    """Returns 1 if it is Player1's turn, and 0 if it is Player2's turn.
+    """
+    if game.is_p1_turn:
+        return 1
+    else:
+        return 0
+
+
+def _get_random_move() -> bool:
+    """Return a random decision.
+    """
+    return random.choice([True, False])
+
+
+def get_mood(game: PDGame) -> int:
+    """Return current mood for moody"""
+    current_mood = 0
+    opponent = get_opponent_num(game)
+    if opponent == 0:
+        moody = 1
+    else:
+        moody = 0
+
+    # go through all the rounds of the game and sum up current mood
+    for round_num in game.decisions:
+        if game.decisions[round_num][opponent] is True:
+            # if opponent cooperates, mood is better
+            current_mood += 5
+        else:  # the opponent betrays
+            if round_num > 1 and game.decisions[round_num - 1][opponent] is False \
+                    and game.decisions[round_num - 1][moody] is True:
+                # if the opponent betrayed while moody cooperates, he is extra mad
+                current_mood -= 15
+            else:
+                current_mood -= 10
+
+    return current_mood
+
+
+if __name__ == '__main__':
+    import python_ta.contracts
+    python_ta.contracts.check_all_contracts()
+
+    import doctest
+    doctest.testmod()
+
+    import python_ta
+    python_ta.check_all(config={
+        'extra-imports': ['pd_game', 'game_tree', 'random'],  # the names (strs) of imported modules
+        'allowed-io': [],  # the names (strs) of functions that call print/open/input
+        'max-line-length': 100,
+        'disable': ['E1136']
+    })

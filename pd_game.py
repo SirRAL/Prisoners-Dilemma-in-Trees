@@ -24,20 +24,6 @@ class PDGame:
         self.decisions = {}
         self.is_p1_turn = True
 
-    def resolve_points(self, decision1: bool, decision2: bool) -> tuple[int, int]:
-        """Return (p1_points, p2_points) according to the decisions made.
-        """
-        if decision1 is True:
-            if decision2 is True:
-                return (5, 5)
-            else:
-                return (0, 15)
-        else:
-            if decision2 is True:
-                return (15, 0)
-            else:
-                return (0, 0)
-
     def resolve_round(self, round_num: int) -> tuple[int, int]:
         """Returns (p1_points, p2_points) according to the results of the round
         specified by <round_num>.
@@ -48,7 +34,7 @@ class PDGame:
             raise ValueError('Tried to find results of a non-existent round!')
         else:
             decisions = self.decisions[round_num]
-            return self.resolve_points(decisions[0], decisions[1])
+            return resolve_points(decisions[0], decisions[1])
 
     def get_points_prev(self, player_num: int) -> int:
         """Returns the number of points gained by the specified player up to the
@@ -58,15 +44,44 @@ class PDGame:
                    for round_num in range(1, self.curr_round)
                    )
 
-    def resolve_game(self, player1_num, player2_num) -> int:
+    def resolve_game(self, player1_num: int, player2_num: int) -> int:
         """Returns the winner of this game. If a tie, returns 3."""
         player1_score = self.get_points_prev(player1_num)
         player2_score = self.get_points_prev(player2_num)
-        print(player1_score)
-        print(player2_score)
         if player1_score > player2_score:
             return 1
         elif player1_score < player2_score:
             return 2
         else:  # Tie
             return 3
+
+
+def resolve_points(decision1: bool, decision2: bool) -> tuple[int, int]:
+    """Return (p1_points, p2_points) according to the decisions made.
+    """
+    if decision1 is True:
+        if decision2 is True:
+            return (5, 5)
+        else:
+            return (0, 15)
+    else:
+        if decision2 is True:
+            return (15, 0)
+        else:
+            return (0, 0)
+
+
+if __name__ == '__main__':
+    import python_ta.contracts
+    python_ta.contracts.check_all_contracts()
+
+    import doctest
+    doctest.testmod()
+
+    import python_ta
+    python_ta.check_all(config={
+        'extra-imports': [],  # the names (strs) of imported modules
+        'allowed-io': [],  # the names (strs) of functions that call print/open/input
+        'max-line-length': 100,
+        'disable': ['E1136']
+    })
