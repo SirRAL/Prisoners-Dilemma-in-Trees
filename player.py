@@ -3,9 +3,9 @@
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
 from __future__ import annotations
+from typing import Optional
 import pd_strategy
 from pd_game import PDGame
-from typing import Optional
 
 
 class Player:
@@ -23,7 +23,7 @@ class Player:
     strategy: Optional[pd_strategy.Strategy]
     player_num: int
 
-    def __init__(self, strategy: Optional[pd_strategy.Strategy], player_num: int):
+    def __init__(self, strategy: Optional[pd_strategy.Strategy], player_num: int) -> None:
         self.curr_points = 0
         self.strategy = strategy
         self.player_num = player_num
@@ -37,3 +37,19 @@ class Player:
         """Return True if this player cooperates, and False otherwise.
         """
         return self.strategy.make_move(game)
+
+
+if __name__ == '__main__':
+    import python_ta.contracts
+    python_ta.contracts.check_all_contracts()
+
+    import doctest
+    doctest.testmod()
+
+    import python_ta
+    python_ta.check_all(config={
+        'extra-imports': ['pd_strategy', 'pd_game'],  # the names (strs) of imported modules
+        'allowed-io': [],  # the names (strs) of functions that call print/open/input
+        'max-line-length': 100,
+        'disable': ['E1136']
+    })

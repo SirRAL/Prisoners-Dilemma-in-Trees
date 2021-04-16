@@ -5,10 +5,10 @@ Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 from tkinter import Tk, Label, Button, Frame, StringVar, ttk, Listbox, messagebox
 from typing import Any, Callable
 from pd_strategy import get_all_strategies, LearningStrategy, JesusStrategy
-from pd_game import PDGame
-from Graph import WeightedGraph
+from pd_game import PDGame, resolve_points
+from graph import WeightedGraph
 from player import Player
-from Heatmap import display_heatmap
+from heatmap import display_heatmap
 
 
 def get_trained_learner(player2: Player, num_rounds: int) -> Player:
@@ -48,7 +48,7 @@ def run_game(game: PDGame, player1: Player, player2: Player) -> None:
         game.is_p1_turn = False
         move2 = player2.make_move(game)
 
-        round_results = game.resolve_points(move1, move2)
+        round_results = resolve_points(move1, move2)
         player1.curr_points += round_results[0]
         player2.curr_points += round_results[1]
 
@@ -75,7 +75,7 @@ def create_and_run_game(num_rounds: int, player1: Player, player2: Player) -> No
         game.is_p1_turn = False
         move2 = player2.make_move(game)
 
-        round_results = game.resolve_points(move1, move2)
+        round_results = resolve_points(move1, move2)
         player1.curr_points += round_results[0]
         player2.curr_points += round_results[1]
 
@@ -132,32 +132,12 @@ def run_tournament(game: PDGame) -> None:
     display_heatmap(graph)
 
 
-# def run_user_game(game: PDGame, player2: Player) -> None:
-#     """Run a game between a user and a computer strategy.
-#     """
-#     player_vs_ai_interface(game)
-#     user = Player(strategy=None, player_num=1)
-#     for _ in range(0, game.num_rounds):
-#         game.is_p1_turn = True
-#         user_move = ...  # take user input
-#         game.is_p1_turn = False
-#         move2 = player2.make_move(game)
-#
-#         round_results = game.resolve_points(user_move, move2)
-#         user.curr_points += round_results[0]
-#         player2.curr_points += round_results[1]
-#
-#         game.decisions[game.curr_round] = (user_move, move2)
-#         game.curr_round += 1
-
-
 def draw_main_window() -> None:
     """Draws the starting menu for the user.
     Execute this function on startup of this module.
     """
     root = Tk()
     root.title('Prisoner\'s Dilemma')
-    # root.geometry('1280x720')
 
     title_label = Label(root, text='Prisoner\'s Dilemma', font='TkHeadingFont:')
 
@@ -394,7 +374,7 @@ def player_vs_ai_interface(game: PDGame, player2: Player) -> None:
         latest_decision_tuple = decisions[game.curr_round - 1]
         player1_decision = latest_decision_tuple[0]
         player2_decision = latest_decision_tuple[1]
-        int_tuple = game.resolve_points(player1_decision, player2_decision)
+        int_tuple = resolve_points(player1_decision, player2_decision)
         if int_tuple[0] >= 0:
             str_player1_points = '+' + str(int_tuple[0])
         else:
@@ -712,9 +692,6 @@ def ai_vs_ai_summary_screen(game: PDGame, player1: Player, player2: Player) -> N
                          command=lambda: destroy_and_open(root, draw_main_window))
     exit_button.grid(row=2, column=2, padx=10)
 
-    # betray_button = Button(decision_window, text='Open Graph')
-    # betray_button.grid(row=2, column=3, padx=10)
-
     insert_statistics()
 
     root.mainloop()
@@ -762,4 +739,5 @@ def battle_royale_summary_screen(game: PDGame) -> None:
     root.mainloop()
 
 
-draw_main_window()
+if __name__ == '__main__':
+    draw_main_window()

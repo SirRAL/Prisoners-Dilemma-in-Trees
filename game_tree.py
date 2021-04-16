@@ -3,9 +3,9 @@
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
 from __future__ import annotations
-from pd_game import PDGame
 from typing import Union, Optional
 import random
+from pd_game import PDGame
 
 
 class _Branch:
@@ -24,9 +24,9 @@ class _Branch:
     avg_pts_gained: float
     trees: Union[tuple[GameTree, GameTree], tuple[()]]
 
-    def __init__(self, trees: Union[tuple[GameTree, GameTree], tuple[()]] = ()) -> None:
+    def __init__(self) -> None:
         self.times_picked = 0
-        self.trees = trees
+        self.trees = ()
         self.avg_pts_gained = 0
 
     def is_empty(self) -> bool:
@@ -58,8 +58,8 @@ class _Branch:
         for tree in self.trees:
             tree.update_avg_pts_gained(game)
 
-        self.avg_pts_gained = sum(tree.pick_chance * tree.avg_pts_gained
-                                  for tree in self.trees)
+        self.avg_pts_gained = sum(game_tree.pick_chance * game_tree.avg_pts_gained
+                                  for game_tree in self.trees)
 
 
 class GameTree:
@@ -72,10 +72,12 @@ class GameTree:
                start of the game. This is the root of the tree.
       - times_picked: the number of times this tree was entered (this decision was made)
       - pick_chance: the probability that the opponent picks Opponent_Move
+      - avg_pts_gained: this tree's estimated average number of points to gain
     """
     moves: tuple[bool, bool]
     times_picked: int
     pick_chance: float
+    avg_pts_gained: float
     # Private Instance Attributes:
     #  - _c_branch: the branch where the AI cooperates
     #  - _b_branch: the branch where the AI betrays
@@ -190,3 +192,19 @@ class GameTree:
         """Updates all properties of the tree needed after every round.
         """
         self.update_avg_pts_gained(game)
+
+
+if __name__ == '__main__':
+    import python_ta.contracts
+    python_ta.contracts.check_all_contracts()
+
+    import doctest
+    doctest.testmod()
+
+    import python_ta
+    python_ta.check_all(config={
+        'extra-imports': ['pd_game', 'random'],  # the names (strs) of imported modules
+        'allowed-io': [],  # the names (strs) of functions that call print/open/input
+        'max-line-length': 100,
+        'disable': ['E1136']
+    })
