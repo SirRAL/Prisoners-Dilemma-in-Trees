@@ -99,16 +99,16 @@ class GrimStrategy(Strategy):
     """A strategy that cooperates until its opponent has betrayed once, and betrays
     the rest of the game.
     """
-    # Private Instance Attributes:
-    #   - _been_betrayed: True if this player has been betrayed before, False otherwise
-
-    _been_betrayed: bool
-
     def __init__(self) -> None:
         self.name = 'Grim Strategy'
         self.desc = 'Cooperates until its opponent has betrayed \n' \
                     ' once, and betrays the rest of the game.'
-        self._been_betrayed = False
+
+    def _been_betrayed(self, game: PDGame) -> bool:
+        """Return whether the opponent has betrayed this game or not.
+        """
+        return False in [decision[self.get_opponent_num(game)] for decision in
+                         game.decisions.values()]
 
     def make_move(self, game: PDGame) -> bool:
         """Cooperates until its opponent has betrayed once, and betrays the rest of the game.
@@ -121,7 +121,8 @@ class GrimStrategy(Strategy):
         # always cooperates on round 1 (required since we can't check prev decisions)
         if curr_round == 1:
             return True
-        elif self._been_betrayed:
+
+        if self._been_betrayed(game):
             return False
         else:
             prev_move = get_opponent_prev_move(game)
@@ -130,23 +131,6 @@ class GrimStrategy(Strategy):
                 return False
             else:
                 return True
-
-            # Version without self.assgined_player
-
-            # # update self.been_betrayed
-            # if game.is_player_1_move:
-            #     p2_prev_move = game.decisions[curr_round - 1][1]
-            #     if p2_prev_move is False:  # opponent betrayed last round
-            #         self._been_betrayed = True
-            #         return False
-            # else:
-            #     p1_prev_move = game.decisions[curr_round - 1][0]
-            #     if p1_prev_move is False:
-            #         self._been_betrayed = True
-            #         return False
-            #
-            # # getting here means that the opponent did not betray yet
-            # return True
 
     def __copy__(self) -> GrimStrategy:
         """"""
