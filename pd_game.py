@@ -1,5 +1,8 @@
 """CSC111 Winter 2021 Final Project
 
+This module creates the PDGame (Prisoner's Dilemma Game) object class which keeps track of our game
+object along with the functions associated with the PDGame class.
+
 Copyright and Usage Information
 ===============================
 

@@ -1,5 +1,8 @@
 """CSC111 Winter 2021 Final Project
 
+This module handles the main functionality of running a game of Prisoner's Dilemma,
+including displaying and handling the user interface (UI).
+
 Copyright and Usage Information
 ===============================
 
@@ -25,9 +28,7 @@ def get_trained_learner(player2: Player, num_rounds: int) -> Player:
 
     Preconditions:
       - player2.player_num == 2
-
     """
-
     num_games = 300
     exploration_chance = 1.0
 
@@ -49,7 +50,6 @@ def get_trained_learner(player2: Player, num_rounds: int) -> Player:
 def run_game(game: PDGame, player1: Player, player2: Player) -> None:
     """Run a game between two computer strategies.
     """
-
     for _ in range(0, int(game.num_rounds)):
         game.is_p1_turn = True
         move1 = player1.make_move(game)
@@ -604,7 +604,7 @@ def draw_battle_royale() -> None:
     instructions2 = Label(input_frame, text='Number of rounds to be played: ')
     instructions2.grid(row=1, column=1)
 
-    num_rounds_possible = [str(x) for x in range(10, 100)]
+    num_rounds_possible = [str(x) for x in range(10, 26)]
     num_rounds = StringVar(root)
     num_rounds.set(num_rounds_possible[0])
     input_field = ttk.Combobox(input_frame, textvariable=num_rounds, values=num_rounds_possible,

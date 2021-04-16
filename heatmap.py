@@ -1,5 +1,8 @@
 """CSC111 Winter 2021 Final Project
 
+This module allows for the display of a heatmap representing the results of an AI
+tournament in a game of Prisoner's Dilemma.
+
 Copyright and Usage Information
 ===============================
 
