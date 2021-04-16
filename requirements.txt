@@ -1,0 +1,12 @@
+# Prisoner's Dilemma Requirements
+
+# Testing and code checking
+hypothesis
+pytest
+python-ta~=1.6.3
+
+
+# Graphics and data visualization
+plotly
+tkinter
+pandas
