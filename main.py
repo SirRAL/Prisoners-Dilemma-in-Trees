@@ -11,9 +11,7 @@ from player import Player
 def run_game(self, game: PDGame, player1: Player, player2: Player) -> None:
     """Run a game between two computer strategies.
     """
-    # player1.player_num = 1
-    # player2.player_num = 2
-
+    #
     for i in range(0, game.num_rounds):
         game.is_p1_turn = True
         move1 = player1.make_move(game)
@@ -65,10 +63,17 @@ def run_tournament(self, game: PDGame, show_heatmap: bool = True) -> None:
         graph = WeightedGraph()
         for strategy1 in all_strategies:
             new_game = PDGame(game.num_rounds)
+<<<<<<< Updated upstream
             player1 = Player(strategy1, 1)
             graph.add_vertex(player1.strategy.name)
             for strategy2 in all_strategies_except_ai:
+=======
+
+            for strategy2 in all_strategies:  # change to all_strategies_except_ai
+                player1 = Player(strategy1, 1)
+>>>>>>> Stashed changes
                 player2 = Player(strategy2, 2)
+                graph.add_vertex(player1.strategy.name)
                 graph.add_vertex(player2.strategy.name)
                 self.run_game(new_game, player1, player2)
                 graph.add_edge((player1.strategy.name, player1.curr_points),

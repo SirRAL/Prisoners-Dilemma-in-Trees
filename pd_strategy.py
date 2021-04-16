@@ -10,8 +10,17 @@ import random
 def get_all_strategies() -> list:
     """ Return a list of all strategies
     """
+<<<<<<< Updated upstream
     return [JesusStrategy, LuciferStrategy, TitForTatStrategy,
             GrimStrategy, ProbabilityStrategy, MoodyStrategy, PavlovStrategy, LearningStrategy]
+=======
+    return [JesusStrategy(), LuciferStrategy(), TitForTatStrategy(),
+            GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
+            PavlovStrategy()]
+    # return [JesusStrategy(), LuciferStrategy(), TitForTatStrategy(),
+    #         GrimStrategy(), ProbabilityStrategy(50), MoodyStrategy(),
+    #         PavlovStrategy(), LearningStrategy()]
+>>>>>>> Stashed changes
 
 class Strategy:
     """A PD strategy algorithm which dictates what decisions to make.
@@ -119,7 +128,8 @@ class GrimStrategy(Strategy):
 
     def __init__(self) -> None:
         self.name = 'Grim Strategy'
-        self.desc = 'Cooperates until its opponent has betrayed once, and betrays the rest of the game'
+        self.desc = 'Cooperates until its opponent has betrayed once, and betrays the rest of the ' \
+                    'game '
         self._been_betrayed = False
 
     def make_move(self, game: PDGame) -> bool:
