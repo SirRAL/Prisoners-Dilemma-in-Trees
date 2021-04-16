@@ -109,19 +109,6 @@ class TitForTatStrategy(Strategy):
         else:
             return self.get_opponent_prev_move(game)
 
-            # Alternate Method:
-            # opponent_player_num = int(not bool(self.assigned_player - 1))
-            # prev_move = game.decisions[curr_round - 1][opponent_player_num]
-            # return prev_move
-            #
-            # Version without self.assigned_player:
-            # if game.is_player_1_move:
-            #     p2_prev_move = game.decisions[curr_round - 1][1]
-            #     return p2_prev_move
-            # else:  # currently player2's move
-            #     p1_prev_move = game.decisions[curr_round - 1][0]
-            #     return p1_prev_move
-
     def __copy__(self) -> TitForTatStrategy:
         """"""
         return TitForTatStrategy()
