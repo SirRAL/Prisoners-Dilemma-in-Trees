@@ -2,7 +2,7 @@
 
 Copyright (c) 2021 Abdus Shaikh, Jason Wang, Samraj Aneja, Kevin Wang
 """
-from tkinter import Tk, Label, Button, Entry, Frame, OptionMenu, StringVar, ttk, Listbox, messagebox
+from tkinter import Tk, Label, Button, Frame, StringVar, ttk, Listbox, messagebox
 from typing import Any, Callable
 from pd_strategy import get_all_strategies, LearningStrategy, JesusStrategy
 from pd_game import PDGame
@@ -60,7 +60,6 @@ def run_game(game: PDGame, player1: Player, player2: Player) -> None:
         game.curr_round += 1
 
 
-
 def create_and_run_game(num_rounds: int, player1: Player, player2: Player) -> None:
     """Create and run a new (non-persistent) game between two computer strategies.
     """
@@ -92,6 +91,7 @@ def run_tournament(game: PDGame) -> None:
     If <show_heatmap> is set, then display a heatmap that shows the match-ups
     between the strategies.
     """
+
     all_strategies = get_all_strategies()
 
     graph = WeightedGraph()
@@ -104,14 +104,17 @@ def run_tournament(game: PDGame) -> None:
             player1 = Player(strategy1, 1)
             player2 = Player(strategy2, 2)
 
+            if isinstance(player1.strategy, LearningStrategy):
+                player1 = get_trained_learner(player2, game.num_rounds)
+
             graph.add_vertex(player1.strategy.name)
 
-            for strategy2 in all_strategies:
-                player2 = Player(strategy2, 2)
-                graph.add_vertex(player2.strategy.name)
-                run_game(new_game, player1, player2)
-                graph.add_edge((player1.strategy.name, player1.curr_points),
-                               (player2.strategy.name, player2.curr_points))
+            # for strategy2 in all_strategies:
+            #     player2 = Player(strategy2, 2)
+            #     graph.add_vertex(player2.strategy.name)
+            #     run_game(new_game, player1, player2)
+            #     graph.add_edge((player1.strategy.name, player1.curr_points),
+            #                    (player2.strategy.name, player2.curr_points))
 
             graph.add_vertex(player2.strategy.name)
 
@@ -241,10 +244,11 @@ def draw_ai_vs_ai() -> None:
     game = PDGame(int(num_rounds.get()))
     game.is_p1_turn = False
 
-    def game_change_rounds() -> None:
+    def game_update_rounds() -> None:
+        """Updates the game's num_rounds to the latest choice made by the user."""
         game.num_rounds = int(num_rounds.get())
 
-    input_field.bind('<<ComboboxSelected>>', game_change_rounds())
+    input_field.bind('<<ComboboxSelected>>', game_update_rounds())
 
     # Matchup label
     matchup_label = Label(root, text='Matchup: ')
@@ -324,7 +328,10 @@ def draw_ai_vs_ai() -> None:
     change_strategy()
 
     # start button
-    start_button = Button(root, text='Start!', command=lambda: destroy_and_open(root, lambda: create_and_run_game(int(num_rounds.get()), player1, player2)), padx=10)
+    start_button = Button(root, text='Start!',
+                          command=lambda: destroy_and_open(
+                              root, lambda: create_and_run_game(
+                                  int(num_rounds.get()), player1, player2)), padx=10)
 
     start_button.grid(row=6, column=2, pady=10)
 
@@ -397,16 +404,20 @@ def player_vs_ai_interface(game: PDGame, player2: Player) -> None:
         return (str_player1_points, str_player2_points)
 
     def victory() -> None:
+        """Shows a message box at player victory."""
         messagebox.showinfo('Victory!', 'Victory! \n\nPress OK to go back to the main menu.')
         root.destroy()
         draw_main_window()
 
     def defeat() -> None:
-        messagebox.showinfo('Defeat!', 'You\'ve been defeated. \n\nPress OK to go back to the main menu.')
+        """Shows a message box at player defeat."""
+        messagebox.showinfo('Defeat!', 'You\'ve been defeated. '
+                                       '\n\nPress OK to go back to the main menu.')
         root.destroy()
         draw_main_window()
 
     def draw() -> None:
+        """Shows a message box at a game draw."""
         messagebox.showinfo('Draw!', 'Tie! \n\nPress OK to go back to the main menu.')
         root.destroy()
         draw_main_window()
@@ -434,13 +445,16 @@ def player_vs_ai_interface(game: PDGame, player2: Player) -> None:
     make_decision_label = Label(decision_window, text='Make Your Decision!', font='TkHeadingFont:')
     make_decision_label.grid(row=1, column=2)
 
-    cooperate_button = Button(decision_window, text='COOPERATE', command=lambda: insert_latest_decision(True))
+    cooperate_button = Button(decision_window, text='COOPERATE',
+                              command=lambda: insert_latest_decision(True))
     cooperate_button.grid(row=2, column=1, padx=10)
 
-    betray_button = Button(decision_window, text='BETRAY', command=lambda: insert_latest_decision(False))
+    betray_button = Button(decision_window, text='BETRAY',
+                           command=lambda: insert_latest_decision(False))
     betray_button.grid(row=2, column=3, padx=10)
 
     def play_round() -> None:
+        """Updates all UI scores to their latest values."""
         turn_label = Label(decision_window, text='Turn: ' + str(game.curr_round))
         turn_label.grid(row=3, column=2)
 
@@ -571,12 +585,9 @@ def draw_player_vs_ai() -> None:
     player2 = Player(JesusStrategy(), 2)
 
     # start button
-    # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
-    # For example, use player1_selection and player2_selection to find which Strategy each chose
-    # and num_rounds
-    # Actually, call the runner, which will call the player vs. ai interface and pass in a game
     start_button = Button(root, text='Start!',
-                          command=lambda: destroy_and_open(root, lambda: player_vs_ai_interface(game, player2)),
+                          command=lambda: destroy_and_open(
+                              root, lambda: player_vs_ai_interface(game, player2)),
                           padx=10, pady=0)
     start_button.grid(row=6, column=2, pady=10)
 
@@ -614,12 +625,16 @@ def draw_battle_royale() -> None:
                                state='readonly')
     input_field.grid(row=2, column=1, pady=10)
 
-    game = PDGame(10)
+    game = PDGame(int(num_rounds.get()))
+    game.is_p1_turn = False
 
-    def game_update_num_rounds() -> None:
+    def game_update_num_rounds(event=None) -> None:
+        """Updates game.num_rounds to its latest value inputted by the user."""
+        if event is None:
+            pass
         game.num_rounds = int(num_rounds.get())
 
-    input_field.bind('<<ComboboxSelected>>', game_update_num_rounds())
+    input_field.bind('<<ComboboxSelected>>', game_update_num_rounds)
 
     # Back button
     back_button = Button(root, text='Back',
@@ -628,8 +643,8 @@ def draw_battle_royale() -> None:
     back_button.grid(row=6, column=0, padx=5)
 
     # start button
-    # TODO: FILL IN COMMAND TO SET STRATEGIES AND CALL A RUNNER
-    start_button = Button(root, text='Start!', command=lambda: battle_royale_summary_screen(PDGame(num_rounds.get())), padx=10, pady=0)
+    start_button = Button(root, text='Start!',
+                          command=lambda: battle_royale_summary_screen(game), padx=10, pady=0)
     start_button.grid(row=6, column=2, pady=10)
 
     root.mainloop()
@@ -645,7 +660,8 @@ def ai_vs_ai_summary_screen(game: PDGame, player1: Player, player2: Player) -> N
 
     root.resizable(False, False)
     root.title('AI vs. AI Summary')
-    title_label = Label(root, text=strategy_1 + ' vs. ' + strategy_2 + ' AI Game Summary', font='TkHeadingFont:')
+    title_label = Label(root, text=strategy_1 + ' vs. ' + strategy_2 + ' AI Game Summary',
+                        font='TkHeadingFont:')
     title_label.grid(row=1, column=2, pady=15)
 
     # interface_frame is high level frame
@@ -688,7 +704,8 @@ def ai_vs_ai_summary_screen(game: PDGame, player1: Player, player2: Player) -> N
     make_decision_label = Label(decision_window, text='Other Options', font='TkHeadingFont:')
     make_decision_label.grid(row=1, column=2)
 
-    exit_button = Button(decision_window, text='Go Back', command=lambda: destroy_and_open(root, draw_main_window))
+    exit_button = Button(decision_window, text='Go Back',
+                         command=lambda: destroy_and_open(root, draw_main_window))
     exit_button.grid(row=2, column=2, padx=10)
 
     # betray_button = Button(decision_window, text='Open Graph')
@@ -732,7 +749,8 @@ def battle_royale_summary_screen(game: PDGame) -> None:
     visualization_label = Label(decision_window, text='Visualization', font='TkHeadingFont:')
     visualization_label.grid(row=1, column=1)
 
-    heatmap_button = Button(decision_window, text='Open Heatmap', command=lambda: run_tournament(game))
+    heatmap_button = Button(decision_window, text='Open Heatmap',
+                            command=lambda: run_tournament(game))
     heatmap_button.grid(row=2, column=1, padx=10, pady=15)
 
     insert_statistics()
