@@ -294,6 +294,7 @@ class MoodyStrategy(Strategy):
         """"""
         return MoodyStrategy()
 
+
 class PavlovStrategy(Strategy):
     """A strategy that cooperates if the opponent makes the same move as it, betrays otherwise.
     """

@@ -84,33 +84,51 @@ def create_and_run_game(num_rounds: int, player1: Player, player2: Player) -> No
     ai_vs_ai_summary_screen(game)
 
 
-def run_tournament(game: PDGame, show_heatmap: bool = True) -> None:
+def run_tournament(game: PDGame) -> None:
     """Run a tournament between all strategies.
 
     If <show_heatmap> is set, then display a heatmap that shows the match-ups
     between the strategies.
     """
+    # breakpoint()
     all_strategies = get_all_strategies()
-    all_strategies_except_ai = get_all_strategies()[:7]
-    if not show_heatmap:
-        for strategy1 in all_strategies:
+    # if not show_heatmap:
+    #     for strategy1 in all_strategies:
+    #         for strategy2 in all_strategies_except_ai:
+    #             new_game = PDGame(game.num_rounds)
+    #             player1 = Player(strategy1, 1)
+    #             player2 = Player(strategy2, 2)
+    #             run_game(new_game, player1, player2)
+    # else:
+    graph = WeightedGraph()
+    for s1 in all_strategies:
+        for s2 in all_strategies:
             new_game = PDGame(game.num_rounds)
+            strategy1 = s1.__copy__()
+            strategy2 = s2.__copy__()
+
             player1 = Player(strategy1, 1)
-            for strategy2 in all_strategies_except_ai:
-                player2 = Player(strategy2, 2)
-                run_game(new_game, player1, player2)
-    else:
-        graph = WeightedGraph()
-        for strategy1 in all_strategies:
-            new_game = PDGame(game.num_rounds)
-            player1 = Player(strategy1, 1)
+            player2 = Player(strategy2, 2)
+
             graph.add_vertex(player1.strategy.name)
+
             for strategy2 in all_strategies:
                 player2 = Player(strategy2, 2)
                 graph.add_vertex(player2.strategy.name)
                 run_game(new_game, player1, player2)
                 graph.add_edge((player1.strategy.name, player1.curr_points),
                                (player2.strategy.name, player2.curr_points))
+
+            graph.add_vertex(player2.strategy.name)
+
+            run_game(new_game, player1, player2)
+            if strategy1.name == 'Learning Strategy' and strategy2.name == 'Learning Strategy':
+                player1.curr_points, player2.curr_points = 0, 0
+
+            graph.add_edge((player1.strategy.name, player1.curr_points),
+                           (player2.strategy.name, player2.curr_points))
+
+    display_heatmap(graph)
 
 
 def run_user_game(game: PDGame, player2: Player) -> None:
@@ -725,6 +743,5 @@ def battle_royale_summary_screen(game: PDGame) -> None:
 
     root.mainloop()
 
-draw_main_window()
 
-# display_heatmap(graph)
+draw_main_window()
